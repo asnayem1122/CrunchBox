@@ -9,9 +9,22 @@
   "modes": {
     "calc": "CALC",
     "sci": "SCI",
+    "dev": "DEV",
     "curr": "CURR",
     "unit": "UNIT",
     "tools": "TOOLS"
+  },
+  "dev": {
+    "title": "CSE SYSTEMS WORKBENCH",
+    "subdeck_bases": "BASES",
+    "subdeck_alu": "ALU & BITS",
+    "subdeck_float": "IEEE-754",
+    "subdeck_text": "TEXT CODEC",
+    "subdeck_discrete": "DISCRETE",
+    "bit_grid": "INTERACTIVE BIT GRID",
+    "word_size": "Word Size",
+    "send_to_calc": "SEND TO CALC",
+    "send_to_curr": "SEND TO CURR"
   },
   "calc": {
     "send_to_curr": "SEND -> CURR",

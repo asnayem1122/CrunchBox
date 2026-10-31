@@ -25,24 +25,36 @@ import { KeypadView } from '../features/calculator/KeypadView';
 import { CurrencyView } from '../features/currency/CurrencyView';
 import { UnitConverterView } from '../features/units/UnitConverterView';
 import { SmartToolsView } from '../features/tools/SmartToolsView';
+import { DevView } from '../features/dev/DevView';
 import { useAppStore } from '../store/useAppStore';
 import { toHexBinOct } from '../features/calculator/calcEngine';
 import {
+  computeAluOperation,
+  formatBigIntBase,
+  parseToBigInt,
+  formatDigitGrouping,
+} from '../features/dev/devEngine';
+import {
   getThemeTokens,
-  hardwareConstants,
 } from '../utils/themeTokens';
+import { useHardwareLayout } from '../utils/useHardwareLayout';
 import { triggerTactileFeedback } from '../utils/soundEffects';
 
 export default function MainChassisScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const [isTapeOpen, setIsTapeOpen] = useState(false);
+  const layout = useHardwareLayout();
 
   const {
     activeMode,
     setMode,
     themeMode,
     toggleTheme,
+    lcdBacklightMode,
+    toggleLcdBacklight,
+    digitGroupingMode,
+    toggleDigitGroupingMode,
     soundEnabled,
     toggleSound,
     hapticsEnabled,
@@ -54,6 +66,16 @@ export default function MainChassisScreen() {
     calcError,
     paperTape,
     refreshExchangeRates,
+    ratesSource,
+    ratesStale,
+    // DEV State for LCD feed
+    devBase,
+    devWordSize,
+    devOperandA,
+    devOperandB,
+    devActiveRegister,
+    devAluOp,
+    devIsSigned,
   } = useAppStore();
 
   const tokens = getThemeTokens(themeMode);
@@ -63,8 +85,8 @@ export default function MainChassisScreen() {
     refreshExchangeRates().catch(() => {});
   }, [refreshExchangeRates]);
 
-  // Compute live HEX/BIN/OCT base conversion for integer result
-  const { hex, bin, oct } = useMemo(() => {
+  // Compute live HEX/BIN/OCT base conversion for integer result (CALC / SCI)
+  const calcBaseValues = useMemo(() => {
     const numeric = parseFloat(calcResult.replace(/,/g, ''));
     if (!Number.isNaN(numeric)) {
       return toHexBinOct(numeric);
@@ -72,23 +94,48 @@ export default function MainChassisScreen() {
     return { hex: '0x0', bin: '0', oct: '0' };
   }, [calcResult]);
 
+  // Compute live DEV ALU flags and base values
+  const devAluResult = useMemo(
+    () => computeAluOperation(devOperandA, devOperandB, devAluOp, devWordSize),
+    [devOperandA, devOperandB, devAluOp, devWordSize]
+  );
+
+  const devActiveValBig = useMemo(() => {
+    const activeStr = devActiveRegister === 'A' ? devOperandA : devOperandB;
+    return parseToBigInt(activeStr, 'DEC');
+  }, [devActiveRegister, devOperandA, devOperandB]);
+
+  const devLcdDisplayValue = useMemo(() => {
+    if (activeMode !== 'DEV') return calcExpression || calcResult;
+    const formatted = formatBigIntBase(devActiveValBig, devBase, devWordSize, devIsSigned);
+    return devBase === 'DEC' ? formatDigitGrouping(formatted, digitGroupingMode) : formatted;
+  }, [activeMode, calcExpression, calcResult, devActiveValBig, devBase, devWordSize, devIsSigned, digitGroupingMode]);
+
+  const devBaseValues = useMemo(() => {
+    return {
+      hex: formatBigIntBase(devActiveValBig, 'HEX', devWordSize, false),
+      bin: formatBigIntBase(devActiveValBig, 'BIN', devWordSize, false),
+      oct: formatBigIntBase(devActiveValBig, 'OCT', devWordSize, false),
+    };
+  }, [devActiveValBig, devWordSize]);
+
   const handleOpenSettings = () => {
-    triggerTactileFeedback(soundEnabled, hapticsEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
     router.push('/settings');
   };
 
   const handleToggleTape = () => {
-    triggerTactileFeedback(soundEnabled, hapticsEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
     setIsTapeOpen((prev) => !prev);
   };
 
   const handleToggleSound = () => {
-    triggerTactileFeedback(soundEnabled, hapticsEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
     toggleSound();
   };
 
   const handleToggleTheme = () => {
-    triggerTactileFeedback(soundEnabled, hapticsEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
     toggleTheme();
   };
 
@@ -97,13 +144,19 @@ export default function MainChassisScreen() {
       style={[styles.safeArea, { backgroundColor: tokens.appBackground }]}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: layout.safeTopInset, paddingHorizontal: layout.chassisPadding },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         {/* Top Hardware Quick Toolbar */}
         <View style={styles.topToolbar}>
           {/* Paper Tape Drawer Toggle with Count Badge */}
           <Pressable
+            accessible={true}
+            accessibilityLabel={`Paper Tape Drawer, ${paperTape.length} items`}
+            testID="toolbar-tape-button"
             onPress={handleToggleTape}
             style={[
               styles.toolBtn,
@@ -133,6 +186,9 @@ export default function MainChassisScreen() {
           <View style={styles.toolBtnCluster}>
             {/* Audio Toggle */}
             <Pressable
+              accessible={true}
+              accessibilityLabel={`Sound: ${soundEnabled ? 'Enabled' : 'Disabled'}`}
+              testID="toolbar-sound-button"
               onPress={handleToggleSound}
               style={[
                 styles.iconBtn,
@@ -152,6 +208,9 @@ export default function MainChassisScreen() {
 
             {/* Theme Toggle */}
             <Pressable
+              accessible={true}
+              accessibilityLabel={`Theme: ${themeMode}`}
+              testID="toolbar-theme-button"
               onPress={handleToggleTheme}
               style={[
                 styles.iconBtn,
@@ -171,6 +230,9 @@ export default function MainChassisScreen() {
 
             {/* Settings Gear Button */}
             <Pressable
+              accessible={true}
+              accessibilityLabel="Hardware Settings"
+              testID="toolbar-settings-button"
               onPress={handleOpenSettings}
               style={[
                 styles.iconBtn,
@@ -191,24 +253,30 @@ export default function MainChassisScreen() {
           themeMode={themeMode}
           statusText={`CB-09 // ${activeMode} MODE`}
         >
-          {/* Recessed Phosphor Sage Visor LCD Display */}
+          {/* Recessed Visor LCD Display with Micro-Annunciators & Backlight Switch */}
           <LcdDisplay
-            expression={calcExpression}
-            value={calcExpression || calcResult}
+            expression={activeMode === 'DEV' ? `REG ${devActiveRegister} [${devBase}]` : calcExpression}
+            value={devLcdDisplayValue}
             mode={activeMode}
             angleMode={angleMode}
             onToggleAngleMode={toggleAngleMode}
             memoryActive={calcMemory !== 0}
-            hexValue={hex}
-            binValue={bin}
-            octValue={oct}
+            hexValue={activeMode === 'DEV' ? devBaseValues.hex : calcBaseValues.hex}
+            binValue={activeMode === 'DEV' ? devBaseValues.bin : calcBaseValues.bin}
+            octValue={activeMode === 'DEV' ? devBaseValues.oct : calcBaseValues.oct}
             themeMode={themeMode}
+            backlightMode={lcdBacklightMode}
+            onToggleBacklight={toggleLcdBacklight}
+            digitGroupingMode={digitGroupingMode}
+            onToggleDigitGrouping={toggleDigitGroupingMode}
+            rateFreshness={activeMode === 'CURR' ? (ratesStale ? 'bundled' : ratesSource) : undefined}
+            aluFlags={activeMode === 'DEV' ? devAluResult.flags : null}
             error={calcError}
             soundEnabled={soundEnabled}
             hapticsEnabled={hapticsEnabled}
           />
 
-          {/* 5-Way Mode Switcher Deck */}
+          {/* 6-Way Tactile Hardware Matrix Mode Switcher Deck */}
           <ModeSelector
             activeMode={activeMode}
             onChangeMode={setMode}
@@ -220,6 +288,10 @@ export default function MainChassisScreen() {
           {/* Active Hardware Deck View */}
           {activeMode === 'CALC' || activeMode === 'SCI' ? (
             <KeypadView themeMode={themeMode} />
+          ) : null}
+
+          {activeMode === 'DEV' ? (
+            <DevView themeMode={themeMode} />
           ) : null}
 
           {activeMode === 'CURR' ? (
@@ -251,9 +323,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: 20,
   },
   topToolbar: {
     width: '100%',
@@ -262,42 +334,41 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
-    paddingHorizontal: 2,
   },
   toolBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    paddingVertical: 5,
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: hardwareConstants.borderRadiusSm,
+    borderRadius: 8,
+    gap: 6,
   },
   toolBtnText: {
-    fontSize: 10,
-    fontWeight: '900',
+    fontSize: 11,
     fontFamily: 'monospace',
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
   countBadge: {
     paddingHorizontal: 5,
     paddingVertical: 1,
-    borderRadius: 8,
-    borderWidth: 1.2,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   countBadgeText: {
-    fontSize: 8.5,
-    fontWeight: '900',
+    fontSize: 10,
     fontFamily: 'monospace',
+    fontWeight: '900',
     color: '#1B241E',
   },
   toolBtnCluster: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   iconBtn: {
     padding: 7,
-    borderRadius: hardwareConstants.borderRadiusSm,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },

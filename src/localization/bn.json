@@ -9,9 +9,22 @@
   "modes": {
     "calc": "হিসাব",
     "sci": "বিজ্ঞান",
+    "dev": "সিএসই",
     "curr": "কারেন্সি",
     "unit": "একক",
     "tools": "টুলস"
+  },
+  "dev": {
+    "title": "সিএসই সিস্টেম ওয়ার্কবেঞ্চ",
+    "subdeck_bases": "বেস কনভার্টার",
+    "subdeck_alu": "এএলইউ ও বিট",
+    "subdeck_float": "আইইইই-৭৫৪",
+    "subdeck_text": "টেক্সট কোডেক",
+    "subdeck_discrete": "ডিসক্রিট ম্যাথ",
+    "bit_grid": "ইন্টারেক্টিভ বিট গ্রিড",
+    "word_size": "শব্দ আকার",
+    "send_to_calc": "হিসাবে পাঠান",
+    "send_to_curr": "মুদ্রায় পাঠান"
   },
   "calc": {
     "send_to_curr": "টাকা পাঠান ->",

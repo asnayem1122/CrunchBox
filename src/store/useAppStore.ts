@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ThemeMode } from '../utils/themeTokens';
+import { ThemeMode, LcdBacklightMode } from '../utils/themeTokens';
 import { HardwareMode } from '../components/chassis/ModeSelector';
 import {
   evaluateExpression,
@@ -11,6 +11,17 @@ import {
 import { BUNDLED_RATES_USD } from '../features/currency/bundledRates';
 import { fetchExchangeRates } from '../services/exchange-rate/api';
 import { UnitCategory, UNIT_DEFINITIONS } from '../features/units/unitDefinitions';
+import {
+  DevBase,
+  DevWordSize,
+  BitwiseOp,
+  isValidDigitForBase,
+  parseToBigInt,
+  formatBigIntBase,
+  toggleBit,
+  twosComplementNegate,
+  getWordMask,
+} from '../features/dev/devEngine';
 import i18n from '../localization/i18n';
 
 export interface PaperTapeEntry {
@@ -19,12 +30,17 @@ export interface PaperTapeEntry {
   expression: string;
   result: string;
   mode: HardwareMode;
+  isPinned?: boolean;
 }
+
+export type DevSubDeck = 'BASES' | 'ALU' | 'FLOAT' | 'TEXT' | 'DISCRETE';
 
 export interface AppState {
   // Mode & System Appearance
   activeMode: HardwareMode;
   themeMode: ThemeMode;
+  lcdBacklightMode: LcdBacklightMode;
+  digitGroupingMode: 'BD' | 'INTL';
   language: 'en' | 'bn';
   soundEnabled: boolean;
   hapticsEnabled: boolean;
@@ -54,10 +70,25 @@ export interface AppState {
   toUnit: string;
   unitAmount: string;
 
-  // Actions: System
+  // DEV Mode State (Strictly Strings for JSON persistence safety - Mandatory Rule 2)
+  devBase: DevBase;
+  devWordSize: DevWordSize;
+  devOperandA: string;
+  devOperandB: string;
+  devActiveRegister: 'A' | 'B';
+  devSubDeck: DevSubDeck;
+  devFloatInput: string;
+  devTextInput: string;
+  devIsSigned: boolean;
+  devAluOp: BitwiseOp;
+
+  // Actions: System & Ergonomics
   setMode: (mode: HardwareMode) => void;
   toggleTheme: () => void;
   setThemeMode: (theme: ThemeMode) => void;
+  setLcdBacklightMode: (mode: LcdBacklightMode) => void;
+  toggleLcdBacklight: () => void;
+  toggleDigitGroupingMode: () => void;
   setLanguage: (lang: 'en' | 'bn') => void;
   toggleSound: () => void;
   toggleHaptics: () => void;
@@ -78,6 +109,7 @@ export interface AppState {
   addPaperTapeEntry: (entry: Omit<PaperTapeEntry, 'id' | 'timestamp'>) => void;
   tearTape: () => void;
   recallTapeEntry: (id: string) => void;
+  togglePinTapeEntry: (id: string) => void;
 
   // Actions: Currency
   setCurrencies: (from: string, to: string) => void;
@@ -91,39 +123,52 @@ export interface AppState {
   setUnits: (from: string, to: string) => void;
   swapUnits: () => void;
   setUnitAmount: (amount: string) => void;
+
+  // Actions: DEV Mode
+  setDevBase: (base: DevBase) => void;
+  setDevWordSize: (size: DevWordSize) => void;
+  setDevOperandA: (val: string) => void;
+  setDevOperandB: (val: string) => void;
+  setDevActiveRegister: (reg: 'A' | 'B') => void;
+  setDevSubDeck: (deck: DevSubDeck) => void;
+  setDevFloatInput: (val: string) => void;
+  setDevTextInput: (val: string) => void;
+  toggleDevSigned: () => void;
+  setDevAluOp: (op: BitwiseOp) => void;
+  inputDevKey: (char: string) => void;
+  deleteDevLast: () => void;
+  clearDev: () => void;
+  toggleDevBit: (bitIndex: number) => void;
+  negateDevTwosComp: () => void;
+  sendDevToCalc: () => void;
+  sendDevToCurrency: () => void;
 }
 
 // SSR-safe in-memory storage fallback for web exports & testing
 const memoryStorageMap = new Map<string, string>();
 const ssrSafeStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
-    if (typeof window === 'undefined') {
-      return memoryStorageMap.get(name) || null;
-    }
     try {
-      return await AsyncStorage.getItem(name);
+      const val = await AsyncStorage.getItem(name);
+      return val ?? memoryStorageMap.get(name) ?? null;
     } catch {
       return memoryStorageMap.get(name) || null;
     }
   },
   setItem: async (name: string, value: string): Promise<void> => {
     memoryStorageMap.set(name, value);
-    if (typeof window !== 'undefined') {
-      try {
-        await AsyncStorage.setItem(name, value);
-      } catch {
-        // Fallback silently
-      }
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch {
+      // Fallback silently
     }
   },
   removeItem: async (name: string): Promise<void> => {
     memoryStorageMap.delete(name);
-    if (typeof window !== 'undefined') {
-      try {
-        await AsyncStorage.removeItem(name);
-      } catch {
-        // Fallback silently
-      }
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch {
+      // Fallback silently
     }
   },
 };
@@ -131,14 +176,16 @@ const ssrSafeStorage: StateStorage = {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      // Defaults
+      // System Defaults
       activeMode: 'CALC',
       themeMode: 'field',
+      lcdBacklightMode: 'sage',
+      digitGroupingMode: 'INTL',
       language: 'en',
       soundEnabled: true,
       hapticsEnabled: true,
 
-      // Calculator defaults
+      // Calculator Defaults
       calcExpression: '',
       calcResult: '0',
       calcMemory: 0,
@@ -146,11 +193,11 @@ export const useAppStore = create<AppState>()(
       calcError: null,
       paperTape: [],
 
-      // Currency defaults
+      // Currency Defaults
       fromCurrency: 'USD',
       toCurrency: 'BDT',
-      currencyAmount: '100',
-      exchangeRates: { ...BUNDLED_RATES_USD, USD: 1.0 },
+      currencyAmount: '1',
+      exchangeRates: { ...BUNDLED_RATES_USD, USD: 1 },
       ratesEffectiveDate: '2026-10-30',
       ratesFetchedAt: 0,
       ratesSource: 'bundled',
@@ -160,59 +207,101 @@ export const useAppStore = create<AppState>()(
         { from: 'EUR', to: 'BDT' },
         { from: 'SAR', to: 'BDT' },
         { from: 'AED', to: 'BDT' },
-        { from: 'GBP', to: 'BDT' },
       ],
 
-      // Unit Converter defaults
+      // Units Defaults
       unitCategory: 'AREA',
       fromUnit: 'bigha',
       toUnit: 'katha',
       unitAmount: '1',
 
+      // DEV Mode Defaults (Strings for state safety)
+      devBase: 'HEX',
+      devWordSize: 32,
+      devOperandA: '0',
+      devOperandB: '0',
+      devActiveRegister: 'A',
+      devSubDeck: 'BASES',
+      devFloatInput: '-12.375',
+      devTextInput: 'Crunch',
+      devIsSigned: false,
+      devAluOp: 'AND',
+
       // System Actions
       setMode: (mode) => set({ activeMode: mode }),
+
       toggleTheme: () =>
         set((state) => ({
           themeMode: state.themeMode === 'field' ? 'tactical' : 'field',
         })),
+
       setThemeMode: (theme) => set({ themeMode: theme }),
+
+      setLcdBacklightMode: (mode) => set({ lcdBacklightMode: mode }),
+
+      toggleLcdBacklight: () =>
+        set((state) => {
+          const next =
+            state.lcdBacklightMode === 'sage'
+              ? 'amber'
+              : state.lcdBacklightMode === 'amber'
+              ? 'stealth'
+              : 'sage';
+          return { lcdBacklightMode: next };
+        }),
+
+      toggleDigitGroupingMode: () =>
+        set((state) => ({
+          digitGroupingMode: state.digitGroupingMode === 'INTL' ? 'BD' : 'INTL',
+        })),
+
       setLanguage: (lang) => {
         i18n.changeLanguage(lang);
         set({ language: lang });
       },
-      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
-      toggleHaptics: () =>
-        set((state) => ({ hapticsEnabled: !state.hapticsEnabled })),
 
-      // Calculator Keypad Actions
+      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+
+      toggleHaptics: () => set((state) => ({ hapticsEnabled: !state.hapticsEnabled })),
+
+      // Calculator Actions
       inputCalcKey: (key) =>
         set((state) => {
-          // If we had an error, clear it before input
           if (state.calcError) {
-            return { calcError: null, calcExpression: key };
+            return {
+              calcError: null,
+              calcExpression: key,
+              calcResult: key,
+            };
           }
-          return { calcExpression: state.calcExpression + key };
+          const nextExpr = state.calcExpression + key;
+          return { calcExpression: nextExpr };
         }),
 
       evaluateCalc: () => {
-        const { calcExpression, angleMode, addPaperTapeEntry } = get();
-        if (!calcExpression) return;
+        const { calcExpression, angleMode, addPaperTapeEntry, activeMode } = get();
+        if (!calcExpression || calcExpression.trim() === '') return;
 
-        const { result, error } = evaluateExpression(calcExpression, angleMode);
-        if (error || Number.isNaN(result)) {
-          set({ calcError: 'ERROR' });
-        } else {
-          const formatted = formatCalcNumber(result);
+        try {
+          const evalResult = evaluateExpression(calcExpression, angleMode);
+          if (evalResult.error) {
+            set({ calcError: evalResult.error });
+            return;
+          }
+          const formatted = formatCalcNumber(evalResult.result);
           addPaperTapeEntry({
             expression: calcExpression,
             result: formatted,
-            mode: 'CALC',
+            mode: activeMode,
           });
           set({
             calcResult: formatted,
             calcExpression: '',
             calcError: null,
           });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : 'Error';
+          set({ calcError: msg });
         }
       },
 
@@ -226,9 +315,12 @@ export const useAppStore = create<AppState>()(
       deleteCalcLast: () =>
         set((state) => {
           if (state.calcError) {
-            return { calcError: null, calcExpression: '' };
+            return { calcError: null, calcResult: '0' };
           }
-          return { calcExpression: state.calcExpression.slice(0, -1) };
+          if (state.calcExpression.length > 0) {
+            return { calcExpression: state.calcExpression.slice(0, -1) };
+          }
+          return {};
         }),
 
       toggleAngleMode: () =>
@@ -237,43 +329,42 @@ export const useAppStore = create<AppState>()(
         })),
 
       memoryAdd: () => {
-        const { calcExpression, calcResult, calcMemory, angleMode } = get();
-        const target = calcExpression || calcResult;
-        const { result } = evaluateExpression(target, angleMode);
-        if (!Number.isNaN(result)) {
-          set({ calcMemory: calcMemory + result });
+        const { calcResult, calcMemory } = get();
+        const num = parseFloat(calcResult.replace(/,/g, ''));
+        if (!Number.isNaN(num)) {
+          set({ calcMemory: calcMemory + num });
         }
       },
 
       memorySubtract: () => {
-        const { calcExpression, calcResult, calcMemory, angleMode } = get();
-        const target = calcExpression || calcResult;
-        const { result } = evaluateExpression(target, angleMode);
-        if (!Number.isNaN(result)) {
-          set({ calcMemory: calcMemory - result });
+        const { calcResult, calcMemory } = get();
+        const num = parseFloat(calcResult.replace(/,/g, ''));
+        if (!Number.isNaN(num)) {
+          set({ calcMemory: calcMemory - num });
         }
       },
 
       memoryRecall: () => {
         const { calcMemory } = get();
-        set((state) => ({
-          calcExpression: state.calcExpression + calcMemory.toString(),
+        const formatted = formatCalcNumber(calcMemory);
+        set({
+          calcResult: formatted,
+          calcExpression: formatted,
           calcError: null,
-        }));
+        });
       },
 
       memoryClear: () => set({ calcMemory: 0 }),
 
-      // Calc-to-Currency Bridge (Mandatory Rule #5)
       sendCalcToCurrency: () => {
         const { calcExpression, calcResult, angleMode, evaluateCalc } = get();
         let targetValue = calcResult;
 
         // If an expression is currently pending, evaluate it first
         if (calcExpression.trim()) {
-          const { result, error } = evaluateExpression(calcExpression, angleMode);
-          if (!error && !Number.isNaN(result)) {
-            targetValue = formatCalcNumber(result);
+          const evalRes = evaluateExpression(calcExpression, angleMode);
+          if (!evalRes.error && !Number.isNaN(evalRes.result)) {
+            targetValue = formatCalcNumber(evalRes.result);
             evaluateCalc();
           }
         }
@@ -288,20 +379,25 @@ export const useAppStore = create<AppState>()(
         });
       },
 
-      // Paper Tape Receipt Actions
+      // Paper Tape Actions
       addPaperTapeEntry: (entry) =>
         set((state) => {
           const newEntry: PaperTapeEntry = {
-            id: `tape_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-            timestamp: Date.now(),
             ...entry,
+            id: `tape_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            timestamp: Date.now(),
+            isPinned: false,
           };
-          // Keep up to 50 entries
           const updatedTape = [newEntry, ...state.paperTape].slice(0, 50);
           return { paperTape: updatedTape };
         }),
 
-      tearTape: () => set({ paperTape: [] }),
+      tearTape: () =>
+        set((state) => {
+          // Keep pinned entries, clear unpinned
+          const pinnedOnly = state.paperTape.filter((item) => item.isPinned);
+          return { paperTape: pinnedOnly.length === state.paperTape.length ? [] : pinnedOnly };
+        }),
 
       recallTapeEntry: (id) => {
         const { paperTape } = get();
@@ -315,6 +411,13 @@ export const useAppStore = create<AppState>()(
           });
         }
       },
+
+      togglePinTapeEntry: (id) =>
+        set((state) => ({
+          paperTape: state.paperTape.map((item) =>
+            item.id === id ? { ...item, isPinned: !item.isPinned } : item
+          ),
+        })),
 
       // Currency Actions
       setCurrencies: (from, to) =>
@@ -384,12 +487,136 @@ export const useAppStore = create<AppState>()(
         })),
 
       setUnitAmount: (amount) => set({ unitAmount: amount }),
+
+      // DEV Mode Actions
+      setDevBase: (base) => set({ devBase: base }),
+
+      setDevWordSize: (size) =>
+        set((state) => {
+          const mask = getWordMask(size);
+          const a = (parseToBigInt(state.devOperandA, state.devBase) & mask).toString(10);
+          const b = (parseToBigInt(state.devOperandB, state.devBase) & mask).toString(10);
+          return {
+            devWordSize: size,
+            devOperandA: a,
+            devOperandB: b,
+          };
+        }),
+
+      setDevOperandA: (val) => set({ devOperandA: val }),
+
+      setDevOperandB: (val) => set({ devOperandB: val }),
+
+      setDevActiveRegister: (reg) => set({ devActiveRegister: reg }),
+
+      setDevSubDeck: (deck) => set({ devSubDeck: deck }),
+
+      setDevFloatInput: (val) => set({ devFloatInput: val }),
+
+      setDevTextInput: (val) => set({ devTextInput: val }),
+
+      toggleDevSigned: () => set((state) => ({ devIsSigned: !state.devIsSigned })),
+
+      setDevAluOp: (op) => set({ devAluOp: op }),
+
+      inputDevKey: (char) =>
+        set((state) => {
+          const { devBase, devWordSize, devActiveRegister } = state;
+          if (!isValidDigitForBase(char, devBase)) return {};
+
+          const currentVal = devActiveRegister === 'A' ? state.devOperandA : state.devOperandB;
+          let currentDisplay = '';
+          const currentBig = parseToBigInt(currentVal, 'DEC');
+          if (devBase === 'HEX') currentDisplay = currentBig.toString(16).toUpperCase();
+          else if (devBase === 'BIN') currentDisplay = currentBig.toString(2);
+          else if (devBase === 'OCT') currentDisplay = currentBig.toString(8);
+          else currentDisplay = currentBig.toString(10);
+
+          if (currentDisplay === '0') currentDisplay = '';
+          const nextDisplay = currentDisplay + char.toUpperCase();
+
+          const parsed = parseToBigInt(nextDisplay, devBase);
+          const mask = getWordMask(devWordSize);
+          const clamped = (parsed & mask).toString(10);
+
+          if (devActiveRegister === 'A') {
+            return { devOperandA: clamped };
+          }
+          return { devOperandB: clamped };
+        }),
+
+      deleteDevLast: () =>
+        set((state) => {
+          const { devBase, devActiveRegister } = state;
+          const currentVal = devActiveRegister === 'A' ? state.devOperandA : state.devOperandB;
+          const currentBig = parseToBigInt(currentVal, 'DEC');
+
+          let str = '';
+          if (devBase === 'HEX') str = currentBig.toString(16).toUpperCase();
+          else if (devBase === 'BIN') str = currentBig.toString(2);
+          else if (devBase === 'OCT') str = currentBig.toString(8);
+          else str = currentBig.toString(10);
+
+          if (str.length <= 1) {
+            return devActiveRegister === 'A' ? { devOperandA: '0' } : { devOperandB: '0' };
+          }
+          const sliced = str.slice(0, -1);
+          const parsed = parseToBigInt(sliced, devBase).toString(10);
+          return devActiveRegister === 'A' ? { devOperandA: parsed } : { devOperandB: parsed };
+        }),
+
+      clearDev: () =>
+        set((state) =>
+          state.devActiveRegister === 'A' ? { devOperandA: '0' } : { devOperandB: '0' }
+        ),
+
+      toggleDevBit: (bitIndex) =>
+        set((state) => {
+          const { devActiveRegister, devWordSize } = state;
+          const currentVal = devActiveRegister === 'A' ? state.devOperandA : state.devOperandB;
+          const nextVal = toggleBit(currentVal, bitIndex, devWordSize);
+          return devActiveRegister === 'A' ? { devOperandA: nextVal } : { devOperandB: nextVal };
+        }),
+
+      negateDevTwosComp: () =>
+        set((state) => {
+          const { devActiveRegister, devWordSize } = state;
+          const currentVal = devActiveRegister === 'A' ? state.devOperandA : state.devOperandB;
+          const negated = twosComplementNegate(currentVal, devWordSize);
+          return devActiveRegister === 'A' ? { devOperandA: negated } : { devOperandB: negated };
+        }),
+
+      sendDevToCalc: () => {
+        const { devOperandA } = get();
+        const big = parseToBigInt(devOperandA, 'DEC');
+        if (big <= BigInt(Number.MAX_SAFE_INTEGER) && big >= BigInt(-Number.MAX_SAFE_INTEGER)) {
+          set({
+            calcResult: big.toString(10),
+            calcExpression: '',
+            calcError: null,
+            activeMode: 'CALC',
+          });
+        }
+      },
+
+      sendDevToCurrency: () => {
+        const { devOperandA } = get();
+        const big = parseToBigInt(devOperandA, 'DEC');
+        if (big <= BigInt(Number.MAX_SAFE_INTEGER) && big >= 0n) {
+          set({
+            currencyAmount: big.toString(10),
+            activeMode: 'CURR',
+          });
+        }
+      },
     }),
     {
       name: '@crunchbox_cb09_store',
       storage: createJSONStorage(() => ssrSafeStorage),
       partialize: (state) => ({
         themeMode: state.themeMode,
+        lcdBacklightMode: state.lcdBacklightMode,
+        digitGroupingMode: state.digitGroupingMode,
         language: state.language,
         soundEnabled: state.soundEnabled,
         hapticsEnabled: state.hapticsEnabled,
@@ -403,6 +630,14 @@ export const useAppStore = create<AppState>()(
         unitCategory: state.unitCategory,
         fromUnit: state.fromUnit,
         toUnit: state.toUnit,
+        devBase: state.devBase,
+        devWordSize: state.devWordSize,
+        devOperandA: state.devOperandA,
+        devOperandB: state.devOperandB,
+        devFloatInput: state.devFloatInput,
+        devTextInput: state.devTextInput,
+        devIsSigned: state.devIsSigned,
+        devSubDeck: state.devSubDeck,
       }),
     }
   )
