@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Android Adaptive Icon Foreground: Centered within 66% safe zone (center 676px circle) -->
+  <g transform="translate(512, 512) scale(0.92) translate(-512, -512)">
+    <!-- Hazard Bar Accent -->
+    <g transform="translate(312, 200)">
+      <rect width="400" height="20" rx="6" fill="#D99E32" stroke="#1B241E" stroke-width="6" />
+      <path d="M 30,0 L 50,20 M 80,0 L 100,20 M 130,0 L 150,20 M 180,0 L 200,20 M 230,0 L 250,20 M 280,0 L 300,20 M 330,0 L 350,20 M 380,0 L 400,20" stroke="#1B241E" stroke-width="10" stroke-linecap="square" />
+    </g>
+
+    <!-- Center Tactile 3D Keycap Module -->
+    <!-- 3D Shadow -->
+    <rect x="232" y="270" width="560" height="490" rx="56" fill="#161D18" />
+    <rect x="232" y="250" width="560" height="490" rx="56" fill="#2E3B33" stroke="#1B241E" stroke-width="20" />
+
+    <!-- Main Keycap Face -->
+    <rect x="232" y="224" width="560" height="480" rx="56" fill="#425246" stroke="#1B241E" stroke-width="22" />
+
+    <!-- Recessed Inner Keycap Chamfer -->
+    <rect x="264" y="254" width="496" height="418" rx="38" fill="#313E34" stroke="#1B241E" stroke-width="12" />
+
+    <!-- Recessed Sage LCD Display -->
+    <g transform="translate(298, 288)">
+      <rect x="0" y="8" width="428" height="188" rx="20" fill="#161D18" />
+      <rect x="0" y="0" width="428" height="188" rx="20" fill="#8FA893" stroke="#1B241E" stroke-width="14" />
+
+      <!-- Scanlines -->
+      <line x1="20" y1="38" x2="408" y2="38" stroke="#7E9682" stroke-width="2" />
+      <line x1="20" y1="76" x2="408" y2="76" stroke="#7E9682" stroke-width="2" />
+      <line x1="20" y1="114" x2="408" y2="114" stroke="#7E9682" stroke-width="2" />
+      <line x1="20" y1="152" x2="408" y2="152" stroke="#7E9682" stroke-width="2" />
+
+      <!-- Micro-Annunciators -->
+      <text x="24" y="38" font-family="monospace" font-size="20" font-weight="900" fill="#1B241E" opacity="0.85">HEX</text>
+      <text x="320" y="38" font-family="monospace" font-size="20" font-weight="900" fill="#1B241E" opacity="0.85">64-BIT</text>
+
+      <!-- Main Bold LCD Readout -->
+      <text x="214" y="136" text-anchor="middle" font-family="monospace" font-size="84" font-weight="900" fill="#1B241E" letter-spacing="6">CB•09</text>
+    </g>
+
+    <!-- Tactile Push Button Array (Below LCD) -->
+    <!-- Key 1: Operator / Orange -->
+    <g transform="translate(304, 510)">
+      <rect x="0" y="10" width="116" height="116" rx="24" fill="#161D18" />
+      <rect x="0" y="0" width="116" height="116" rx="24" fill="#D96B27" stroke="#1B241E" stroke-width="12" />
+      <path d="M 58,35 L 58,81 M 35,58 L 81,58" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" />
+    </g>
+
+    <!-- Key 2: ALU / Sage Light -->
+    <g transform="translate(454, 510)">
+      <rect x="0" y="10" width="116" height="116" rx="24" fill="#161D18" />
+      <rect x="0" y="0" width="116" height="116" rx="24" fill="#8FA893" stroke="#1B241E" stroke-width="12" />
+      <text x="58" y="74" text-anchor="middle" font-family="monospace" font-size="60" font-weight="900" fill="#1B241E">⊻</text>
+    </g>
+
+    <!-- Key 3: Action / Gold -->
+    <g transform="translate(604, 510)">
+      <rect x="0" y="10" width="116" height="116" rx="24" fill="#161D18" />
+      <rect x="0" y="0" width="116" height="116" rx="24" fill="#D99E32" stroke="#1B241E" stroke-width="12" />
+      <path d="M 36,46 L 80,46 M 36,70 L 80,70" stroke="#1B241E" stroke-width="14" stroke-linecap="round" />
+    </g>
+
+    <!-- Bottom Stenciled Mini Badge -->
+    <g transform="translate(512, 780)">
+      <rect x="-180" y="-18" width="360" height="36" rx="8" fill="#1B241E" />
+      <text text-anchor="middle" y="7" font-family="monospace" font-size="20" font-weight="900" fill="#D5DBD2" letter-spacing="4">CRUNCHBOX FIELD UNIT</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Dark Stencil Field Plate -->
+  <rect width="1024" height="1024" rx="200" fill="#1B241E" />
+
+  <!-- Outer Cutout Border with Dashed Rivet Holes -->
+  <rect x="40" y="40" width="944" height="944" rx="160" fill="none" stroke="#D99E32" stroke-width="16" stroke-dasharray="24 16" />
+
+  <!-- Inner Industrial Stencil Shield -->
+  <polygon points="512,100 890,260 890,730 512,924 134,730 134,260" fill="#2E3B33" stroke="#D5DBD2" stroke-width="24" stroke-linejoin="round" />
+
+  <!-- Inner Inset Shield -->
+  <polygon points="512,150 840,290 840,700 512,870 184,700 184,290" fill="#161D18" stroke="#D99E32" stroke-width="12" stroke-linejoin="round" />
+
+  <!-- Massive Stenciled 'CB' Monogram with Integrated 64-bit ALU V-Notch -->
+  <!-- Letter C -->
+  <path d="M 440,360 L 300,360 C 260,360 230,390 230,430 L 230,590 C 230,630 260,660 300,660 L 440,660 L 440,580 L 320,580 L 320,440 L 440,440 Z" fill="#8FA893" stroke="#D5DBD2" stroke-width="16" stroke-linejoin="miter" />
+
+  <!-- Letter B (Tactile Stenciled Double-Loop) -->
+  <path d="M 490,360 L 660,360 C 720,360 760,390 760,440 C 760,480 730,505 690,510 C 740,515 770,550 770,590 C 770,640 720,660 660,660 L 490,660 Z M 570,430 L 570,480 L 650,480 C 670,480 685,470 685,455 C 685,440 670,430 650,430 Z M 570,540 L 570,590 L 660,590 C 680,590 695,580 695,565 C 695,550 680,540 660,540 Z" fill="#D99E32" stroke="#D5DBD2" stroke-width="16" stroke-linejoin="miter" />
+
+  <!-- Central ALU Inverted V-Divider Stencil (Symbolic arithmetic logic unit) -->
+  <polygon points="512,470 545,550 479,550" fill="#D96B27" stroke="#D5DBD2" stroke-width="10" />
+
+  <!-- Binary Matrix Stencil Ticker Top -->
+  <g transform="translate(512, 240)">
+    <rect x="-240" y="-30" width="480" height="60" rx="16" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+    <text text-anchor="middle" y="14" font-family="monospace" font-size="34" font-weight="900" fill="#161D18" letter-spacing="12">1011 0001 1111</text>
+  </g>
+
+  <!-- Brass Rivets at Shield Vertices -->
+  <circle cx="512" cy="100" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+  <circle cx="890" cy="260" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+  <circle cx="890" cy="730" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+  <circle cx="512" cy="924" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+  <circle cx="134" cy="730" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+  <circle cx="134" cy="260" r="28" fill="#D99E32" stroke="#161D18" stroke-width="8" />
+
+  <!-- Stencil Badge Labels -->
+  <g transform="translate(512, 750)">
+    <text text-anchor="middle" font-family="monospace" font-size="44" font-weight="900" fill="#D5DBD2" letter-spacing="8">CRUNCHBOX</text>
+    <text text-anchor="middle" y="50" font-family="monospace" font-size="28" font-weight="900" fill="#8FA893" letter-spacing="6">ALU / 64-BIT / CB-09</text>
+  </g>
+</svg>

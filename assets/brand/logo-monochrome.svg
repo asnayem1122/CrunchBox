@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Android 13+ Themed/Monochrome Icon: Pure white shapes on transparent canvas -->
+  <g transform="translate(512, 512) scale(0.92) translate(-512, -512)">
+    <!-- Hazard Bar Accent -->
+    <rect x="312" y="200" width="400" height="20" rx="6" fill="#FFFFFF" />
+
+    <!-- Center Keycap Outline & Main Block -->
+    <rect x="232" y="240" width="560" height="500" rx="56" fill="none" stroke="#FFFFFF" stroke-width="28" />
+
+    <!-- Recessed Display Outline -->
+    <rect x="298" y="292" width="428" height="188" rx="20" fill="none" stroke="#FFFFFF" stroke-width="20" />
+
+    <!-- LCD Content (Bold Stencil CB-09) -->
+    <text x="512" y="420" text-anchor="middle" font-family="monospace" font-size="88" font-weight="900" fill="#FFFFFF" letter-spacing="6">CB•09</text>
+
+    <!-- Key 1: Plus -->
+    <rect x="304" y="520" width="116" height="116" rx="24" fill="none" stroke="#FFFFFF" stroke-width="16" />
+    <path d="M 362,545 L 362,611 M 331,578 L 393,578" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" />
+
+    <!-- Key 2: XOR symbol -->
+    <rect x="454" y="520" width="116" height="116" rx="24" fill="none" stroke="#FFFFFF" stroke-width="16" />
+    <text x="512" y="598" text-anchor="middle" font-family="monospace" font-size="64" font-weight="900" fill="#FFFFFF">⊻</text>
+
+    <!-- Key 3: Equal -->
+    <rect x="604" y="520" width="116" height="116" rx="24" fill="none" stroke="#FFFFFF" stroke-width="16" />
+    <path d="M 640,566 L 684,566 M 640,590 L 684,590" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" />
+
+    <!-- Bottom Badge Bar -->
+    <rect x="332" y="670" width="360" height="36" rx="8" fill="#FFFFFF" />
+  </g>
+</svg>

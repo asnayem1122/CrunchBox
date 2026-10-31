@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" width="1600" height="480">
+  <defs>
+    <pattern id="wordmark-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#1B241E" stroke-width="1" stroke-opacity="0.1" />
+    </pattern>
+  </defs>
+
+  <!-- Hardware Chassis Badge Background -->
+  <rect width="1600" height="480" rx="48" fill="#D5DBD2" stroke="#1B241E" stroke-width="16" />
+  <rect width="1600" height="480" rx="48" fill="url(#wordmark-grid)" />
+
+  <!-- Corner Hex Screws -->
+  <g transform="translate(60, 60)">
+    <circle r="24" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="14" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-10" y1="-10" x2="10" y2="10" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(1540, 60)">
+    <circle r="24" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="14" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-10" y1="10" x2="10" y2="-10" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(60, 420)">
+    <circle r="24" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="14" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-12" y1="0" x2="12" y2="0" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(1540, 420)">
+    <circle r="24" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="14" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="0" y1="-12" x2="0" y2="12" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+
+  <!-- Left Side: Integrated Tactile Keycap Icon Mark -->
+  <g transform="translate(140, 70) scale(0.66)">
+    <!-- 3D Shadow -->
+    <rect x="0" y="24" width="480" height="460" rx="52" fill="#161D18" />
+    <rect x="0" y="10" width="480" height="460" rx="52" fill="#2E3B33" stroke="#1B241E" stroke-width="18" />
+    <rect x="0" y="0" width="480" height="450" rx="52" fill="#425246" stroke="#1B241E" stroke-width="20" />
+    
+    <!-- Recessed Sage LCD Display -->
+    <g transform="translate(48, 48)">
+      <rect x="0" y="6" width="384" height="180" rx="20" fill="#161D18" />
+      <rect x="0" y="0" width="384" height="180" rx="20" fill="#8FA893" stroke="#1B241E" stroke-width="14" />
+      <text x="24" y="36" font-family="monospace" font-size="20" font-weight="900" fill="#1B241E" opacity="0.8">HEX</text>
+      <text x="280" y="36" font-family="monospace" font-size="20" font-weight="900" fill="#1B241E" opacity="0.8">64-BIT</text>
+      <text x="192" y="130" text-anchor="middle" font-family="monospace" font-size="80" font-weight="900" fill="#1B241E" letter-spacing="6">CB•09</text>
+    </g>
+
+    <!-- 3 Mini Keys -->
+    <g transform="translate(54, 260)">
+      <rect x="0" y="0" width="104" height="104" rx="20" fill="#D96B27" stroke="#1B241E" stroke-width="12" />
+      <path d="M 52,32 L 52,72 M 32,52 L 72,52" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
+    </g>
+    <g transform="translate(188, 260)">
+      <rect x="0" y="0" width="104" height="104" rx="20" fill="#8FA893" stroke="#1B241E" stroke-width="12" />
+      <text x="52" y="68" text-anchor="middle" font-family="monospace" font-size="52" font-weight="900" fill="#1B241E">⊻</text>
+    </g>
+    <g transform="translate(322, 260)">
+      <rect x="0" y="0" width="104" height="104" rx="20" fill="#D99E32" stroke="#1B241E" stroke-width="12" />
+      <path d="M 32,42 L 72,42 M 32,62 L 72,62" stroke="#1B241E" stroke-width="12" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- Vertical Divider Bar -->
+  <line x1="530" y1="80" x2="530" y2="400" stroke="#1B241E" stroke-width="10" stroke-linecap="round" stroke-dasharray="24 16" />
+
+  <!-- Right Side Typography -->
+  <g transform="translate(580, 100)">
+    <!-- Hazard Stripe Pip -->
+    <g transform="translate(0, 0)">
+      <rect width="240" height="16" rx="6" fill="#D99E32" stroke="#1B241E" stroke-width="5" />
+      <path d="M 20,0 L 32,16 M 50,0 L 62,16 M 80,0 L 92,16 M 110,0 L 122,16 M 140,0 L 152,16 M 170,0 L 182,16 M 200,0 L 212,16" stroke="#1B241E" stroke-width="7" stroke-linecap="square" />
+    </g>
+
+    <!-- Main Title -->
+    <text x="0" y="110" font-family="monospace" font-size="112" font-weight="900" fill="#1B241E" letter-spacing="8">CRUNCHBOX</text>
+
+    <!-- Badge Tag -->
+    <g transform="translate(0, 145)">
+      <rect x="0" y="0" width="460" height="42" rx="10" fill="#1B241E" />
+      <text x="230" y="29" text-anchor="middle" font-family="monospace" font-size="24" font-weight="900" fill="#8FA893" letter-spacing="4">CHASSIS: CB-09 FIELD UNIT</text>
+    </g>
+
+    <!-- Subtitle / Tagline -->
+    <text x="0" y="240" font-family="monospace" font-size="30" font-weight="900" fill="#2E3B33" letter-spacing="5">HEAVY-DUTY MATH &amp; MONEY GEAR</text>
+    <text x="0" y="280" font-family="monospace" font-size="22" font-weight="800" fill="#6B786E" letter-spacing="3">CSE SYSTEMS • 165+ CURRENCIES • REGIONAL UNITS</text>
+  </g>
+</svg>

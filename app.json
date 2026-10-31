@@ -4,22 +4,35 @@
     "slug": "crunchbox",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
     "scheme": "crunchbox",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "backgroundColor": "#D8D0C0"
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#D5DBD2"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.crunchbox.cb09"
+      "bundleIdentifier": "com.crunchbox.cb09",
+      "icon": "./assets/images/icon.png"
     },
     "android": {
+      "package": "com.crunchbox.cb09",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#2D5A3C"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundImage": "./assets/images/adaptive-bg.png",
+        "monochromeImage": "./assets/images/monochrome-icon.png",
+        "backgroundColor": "#D5DBD2"
       },
-      "package": "com.crunchbox.cb09"
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.VIBRATE"
+      ]
     },
     "web": {
+      "favicon": "./assets/images/favicon.png",
       "bundler": "metro",
       "output": "static"
     },

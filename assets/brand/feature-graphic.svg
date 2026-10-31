@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <pattern id="feat-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#1B241E" stroke-width="1.2" stroke-opacity="0.1" />
+    </pattern>
+    <radialGradient id="feat-glow" cx="80%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8FA893" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#D5DBD2" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Heavy Outer Chassis Border -->
+  <rect width="1024" height="500" rx="36" fill="#D5DBD2" stroke="#1B241E" stroke-width="16" />
+  <rect width="1024" height="500" rx="36" fill="url(#feat-grid)" />
+  <rect width="1024" height="500" rx="36" fill="url(#feat-glow)" />
+
+  <!-- Corner Screws -->
+  <g transform="translate(48, 48)">
+    <circle r="22" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="12" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-8" y1="-8" x2="8" y2="8" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(976, 48)">
+    <circle r="22" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="12" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-8" y1="8" x2="8" y2="-8" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(48, 452)">
+    <circle r="22" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="12" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="-10" y1="0" x2="10" y2="0" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(976, 452)">
+    <circle r="22" fill="#B0BAAA" stroke="#1B241E" stroke-width="8" />
+    <circle r="12" fill="#D99E32" stroke="#1B241E" stroke-width="4" />
+    <line x1="0" y1="-10" x2="0" y2="10" stroke="#1B241E" stroke-width="5" stroke-linecap="round" />
+  </g>
+
+  <!-- Left Content Column -->
+  <g transform="translate(90, 80)">
+    <!-- Hazard Stripe Bar -->
+    <g transform="translate(0, 0)">
+      <rect width="260" height="16" rx="6" fill="#D99E32" stroke="#1B241E" stroke-width="5" />
+      <path d="M 20,0 L 32,16 M 50,0 L 62,16 M 80,0 L 92,16 M 110,0 L 122,16 M 140,0 L 152,16 M 170,0 L 182,16 M 200,0 L 212,16 M 230,0 L 242,16" stroke="#1B241E" stroke-width="7" stroke-linecap="square" />
+    </g>
+
+    <!-- Main Title -->
+    <text x="0" y="90" font-family="monospace" font-size="78" font-weight="900" fill="#1B241E" letter-spacing="6">CRUNCHBOX</text>
+
+    <!-- Model Nameplate Stencil -->
+    <g transform="translate(0, 118)">
+      <rect width="360" height="34" rx="8" fill="#1B241E" />
+      <text x="180" y="24" text-anchor="middle" font-family="monospace" font-size="20" font-weight="900" fill="#8FA893" letter-spacing="4">CHASSIS MODEL CB-09</text>
+    </g>
+
+    <!-- Tagline -->
+    <text x="0" y="195" font-family="monospace" font-size="26" font-weight="900" fill="#2E3B33" letter-spacing="3">HEAVY-DUTY MATH &amp; MONEY GEAR</text>
+
+    <!-- 3 Badges Strip -->
+    <g transform="translate(0, 226)">
+      <!-- Badge 1: 64-BIT ALU -->
+      <rect x="0" y="0" width="140" height="36" rx="8" fill="#425246" stroke="#1B241E" stroke-width="3" />
+      <text x="70" y="24" text-anchor="middle" font-family="monospace" font-size="14" font-weight="900" fill="#FFFFFF">64-BIT ALU</text>
+
+      <!-- Badge 2: 165+ CURRENCIES -->
+      <rect x="150" y="0" width="168" height="36" rx="8" fill="#D96B27" stroke="#1B241E" stroke-width="3" />
+      <text x="234" y="24" text-anchor="middle" font-family="monospace" font-size="14" font-weight="900" fill="#FFFFFF">165+ CURRENCIES</text>
+
+      <!-- Badge 3: TACTILE HAPTICS -->
+      <rect x="328" y="0" width="160" height="36" rx="8" fill="#D99E32" stroke="#1B241E" stroke-width="3" />
+      <text x="408" y="24" text-anchor="middle" font-family="monospace" font-size="14" font-weight="900" fill="#1B241E">NEO-BRUTALIST</text>
+    </g>
+
+    <text x="0" y="305" font-family="monospace" font-size="18" font-weight="800" fill="#6B786E" letter-spacing="2">OFFLINE-FIRST • BIPOLAR SCIENTIFIC • CSE WORKBENCH</text>
+  </g>
+
+  <!-- Right Side Keycap Hero Illustration -->
+  <g transform="translate(680, 50) scale(0.72)">
+    <!-- 3D Shadow -->
+    <rect x="0" y="24" width="420" height="460" rx="52" fill="#161D18" />
+    <rect x="0" y="10" width="420" height="460" rx="52" fill="#2E3B33" stroke="#1B241E" stroke-width="18" />
+    <rect x="0" y="0" width="420" height="450" rx="52" fill="#425246" stroke="#1B241E" stroke-width="20" />
+    
+    <!-- Recessed Sage LCD Display -->
+    <g transform="translate(36, 40)">
+      <rect x="0" y="6" width="348" height="170" rx="20" fill="#161D18" />
+      <rect x="0" y="0" width="348" height="170" rx="20" fill="#8FA893" stroke="#1B241E" stroke-width="14" />
+      <text x="20" y="34" font-family="monospace" font-size="18" font-weight="900" fill="#1B241E" opacity="0.8">HEX</text>
+      <text x="240" y="34" font-family="monospace" font-size="18" font-weight="900" fill="#1B241E" opacity="0.8">64-BIT</text>
+      <text x="174" y="125" text-anchor="middle" font-family="monospace" font-size="76" font-weight="900" fill="#1B241E" letter-spacing="6">CB•09</text>
+    </g>
+
+    <!-- 3 Mini Tactile Keys -->
+    <g transform="translate(42, 250)">
+      <rect x="0" y="0" width="96" height="96" rx="20" fill="#D96B27" stroke="#1B241E" stroke-width="12" />
+      <path d="M 48,28 L 48,68 M 28,48 L 68,48" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
+    </g>
+    <g transform="translate(162, 250)">
+      <rect x="0" y="0" width="96" height="96" rx="20" fill="#8FA893" stroke="#1B241E" stroke-width="12" />
+      <text x="48" y="66" text-anchor="middle" font-family="monospace" font-size="50" font-weight="900" fill="#1B241E">⊻</text>
+    </g>
+    <g transform="translate(282, 250)">
+      <rect x="0" y="0" width="96" height="96" rx="20" fill="#D99E32" stroke="#1B241E" stroke-width="12" />
+      <path d="M 30,40 L 66,40 M 30,58 L 66,58" stroke="#1B241E" stroke-width="12" stroke-linecap="round" />
+    </g>
+
+    <!-- Bottom Stencil Mark -->
+    <text x="210" y="405" text-anchor="middle" font-family="monospace" font-size="20" font-weight="900" fill="#D5DBD2" letter-spacing="4">MIL-SPEC TACTILE GEAR</text>
+  </g>
+</svg>

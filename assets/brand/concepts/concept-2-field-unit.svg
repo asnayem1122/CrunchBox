@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <pattern id="telemetry-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1B241E" stroke-width="1.2" stroke-opacity="0.1" />
+    </pattern>
+  </defs>
+
+  <!-- Background Matte Plate -->
+  <rect width="1024" height="1024" rx="160" fill="#243028" stroke="#161D18" stroke-width="24" />
+
+  <!-- Roll Cage Outer Frame (Tactile Polyurethane Bumpers) -->
+  <rect x="70" y="70" width="884" height="884" rx="120" fill="#36433A" stroke="#161D18" stroke-width="24" />
+  <rect x="110" y="110" width="804" height="804" rx="90" fill="#D5DBD2" stroke="#161D18" stroke-width="20" />
+  <rect x="110" y="110" width="804" height="804" rx="90" fill="url(#telemetry-grid)" />
+
+  <!-- Heavy Carry Handle / Antenna Bracket at Top -->
+  <g transform="translate(362, 50)">
+    <rect x="0" y="0" width="300" height="40" rx="16" fill="#161D18" />
+    <rect x="20" y="10" width="260" height="20" rx="8" fill="#D99E32" />
+  </g>
+
+  <!-- Corner Rubber Reinforced Hex Bumpers -->
+  <path d="M 70 190 L 190 70 L 110 70 L 70 110 Z" fill="#161D18" />
+  <path d="M 954 190 L 834 70 L 914 70 L 954 110 Z" fill="#161D18" />
+  <path d="M 70 834 L 190 954 L 110 954 L 70 914 Z" fill="#161D18" />
+  <path d="M 954 834 L 834 954 L 914 954 L 954 914 Z" fill="#161D18" />
+
+  <!-- Speaker / Mic Louvers on Left -->
+  <g transform="translate(160, 200)">
+    <line x1="0" y1="0" x2="60" y2="0" stroke="#161D18" stroke-width="12" stroke-linecap="round" />
+    <line x1="0" y1="30" x2="60" y2="30" stroke="#161D18" stroke-width="12" stroke-linecap="round" />
+    <line x1="0" y1="60" x2="60" y2="60" stroke="#161D18" stroke-width="12" stroke-linecap="round" />
+  </g>
+
+  <!-- Large Amber Backlit Telemetry Display -->
+  <g transform="translate(260, 180)">
+    <!-- LCD Bezel -->
+    <rect x="0" y="14" width="580" height="260" rx="32" fill="#161D18" />
+    <rect x="0" y="0" width="580" height="260" rx="32" fill="#E5A823" stroke="#161D18" stroke-width="20" />
+    
+    <!-- Annunciator Pips -->
+    <text x="36" y="52" font-family="monospace" font-size="24" font-weight="900" fill="#1F1500">RX-FIELD</text>
+    <text x="210" y="52" font-family="monospace" font-size="24" font-weight="900" fill="#1F1500">IEEE-754</text>
+    <text x="440" y="52" font-family="monospace" font-size="24" font-weight="900" fill="#1F1500">ALU: OK</text>
+    <line x1="36" y1="70" x2="544" y2="70" stroke="#1F1500" stroke-width="4" stroke-opacity="0.3" />
+
+    <!-- Big Digital Readout -->
+    <text x="290" y="195" text-anchor="middle" font-family="monospace" font-size="110" font-weight="900" fill="#1F1500" letter-spacing="4">8409.5</text>
+  </g>
+
+  <!-- Rotary Mode Selector Dial (Right side) -->
+  <g transform="translate(740, 560)">
+    <circle r="90" fill="#161D18" />
+    <circle r="80" fill="#36433A" stroke="#161D18" stroke-width="12" />
+    <circle r="60" fill="#425246" stroke="#161D18" stroke-width="8" />
+    <line x1="0" y1="0" x2="45" y2="-45" stroke="#D96B27" stroke-width="16" stroke-linecap="round" />
+    <circle r="16" fill="#D99E32" />
+    <!-- Dial notches -->
+    <circle cx="0" cy="-110" r="8" fill="#161D18" />
+    <circle cx="80" cy="-80" r="8" fill="#D96B27" />
+    <circle cx="110" cy="0" r="8" fill="#161D18" />
+    <circle cx="80" cy="80" r="8" fill="#161D18" />
+  </g>
+
+  <!-- Keypad Matrix (Left/Center) -->
+  <g transform="translate(180, 500)">
+    <!-- Row 1 -->
+    <rect x="0" y="0" width="110" height="90" rx="18" fill="#2E3B33" stroke="#161D18" stroke-width="12" />
+    <text x="55" y="58" text-anchor="middle" font-family="monospace" font-size="40" font-weight="900" fill="#D5DBD2">HEX</text>
+
+    <rect x="140" y="0" width="110" height="90" rx="18" fill="#2E3B33" stroke="#161D18" stroke-width="12" />
+    <text x="195" y="58" text-anchor="middle" font-family="monospace" font-size="40" font-weight="900" fill="#D5DBD2">BIN</text>
+
+    <rect x="280" y="0" width="110" height="90" rx="18" fill="#2E3B33" stroke="#161D18" stroke-width="12" />
+    <text x="335" y="58" text-anchor="middle" font-family="monospace" font-size="40" font-weight="900" fill="#D5DBD2">OCT</text>
+
+    <rect x="420" y="0" width="110" height="90" rx="18" fill="#D96B27" stroke="#161D18" stroke-width="12" />
+    <text x="475" y="60" text-anchor="middle" font-family="monospace" font-size="44" font-weight="900" fill="#FFFFFF">CLR</text>
+
+    <!-- Row 2 -->
+    <rect x="0" y="120" width="110" height="90" rx="18" fill="#D5DBD2" stroke="#161D18" stroke-width="12" />
+    <text x="55" y="180" text-anchor="middle" font-family="monospace" font-size="48" font-weight="900" fill="#161D18">7</text>
+
+    <rect x="140" y="120" width="110" height="90" rx="18" fill="#D5DBD2" stroke="#161D18" stroke-width="12" />
+    <text x="195" y="180" text-anchor="middle" font-family="monospace" font-size="48" font-weight="900" fill="#161D18">8</text>
+
+    <rect x="280" y="120" width="110" height="90" rx="18" fill="#D5DBD2" stroke="#161D18" stroke-width="12" />
+    <text x="335" y="180" text-anchor="middle" font-family="monospace" font-size="48" font-weight="900" fill="#161D18">9</text>
+
+    <rect x="420" y="120" width="110" height="90" rx="18" fill="#425246" stroke="#161D18" stroke-width="12" />
+    <text x="475" y="180" text-anchor="middle" font-family="monospace" font-size="52" font-weight="900" fill="#D5DBD2">÷</text>
+
+    <!-- Row 3 (Bottom Execution Bar) -->
+    <rect x="0" y="240" width="250" height="90" rx="18" fill="#D5DBD2" stroke="#161D18" stroke-width="12" />
+    <text x="125" y="300" text-anchor="middle" font-family="monospace" font-size="48" font-weight="900" fill="#161D18">0</text>
+
+    <rect x="280" y="240" width="250" height="90" rx="18" fill="#D99E32" stroke="#161D18" stroke-width="12" />
+    <text x="405" y="305" text-anchor="middle" font-family="monospace" font-size="54" font-weight="900" fill="#161D18">=</text>
+  </g>
+
+  <!-- Nameplate Stencil -->
+  <g transform="translate(512, 900)">
+    <text text-anchor="middle" font-family="monospace" font-size="30" font-weight="900" fill="#161D18" letter-spacing="6">TELEMETRY FIELD UNIT // MODEL CB-09</text>
+  </g>
+</svg>

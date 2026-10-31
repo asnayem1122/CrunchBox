@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <pattern id="grid-pattern" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1B241E" stroke-width="1.2" stroke-opacity="0.12" />
+    </pattern>
+    <filter id="chassis-depth" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="24" stdDeviation="0" flood-color="#161D18" flood-opacity="1" />
+    </filter>
+  </defs>
+
+  <!-- Outer Rounded Field Chassis Frame -->
+  <rect width="1024" height="1024" rx="200" fill="#D5DBD2" stroke="#1B241E" stroke-width="28" />
+  <rect width="1024" height="1024" rx="200" fill="url(#grid-pattern)" />
+
+  <!-- Hardware Corner Hex Screws -->
+  <!-- Top Left -->
+  <g transform="translate(132, 132)">
+    <circle r="46" fill="#B0BAAA" stroke="#1B241E" stroke-width="14" />
+    <circle r="26" fill="#D99E32" stroke="#1B241E" stroke-width="8" />
+    <line x1="-18" y1="-18" x2="18" y2="18" stroke="#1B241E" stroke-width="10" stroke-linecap="round" />
+  </g>
+  <!-- Top Right -->
+  <g transform="translate(892, 132)">
+    <circle r="46" fill="#B0BAAA" stroke="#1B241E" stroke-width="14" />
+    <circle r="26" fill="#D99E32" stroke="#1B241E" stroke-width="8" />
+    <line x1="-18" y1="18" x2="18" y2="-18" stroke="#1B241E" stroke-width="10" stroke-linecap="round" />
+  </g>
+  <!-- Bottom Left -->
+  <g transform="translate(132, 892)">
+    <circle r="46" fill="#B0BAAA" stroke="#1B241E" stroke-width="14" />
+    <circle r="26" fill="#D99E32" stroke="#1B241E" stroke-width="8" />
+    <line x1="-22" y1="0" x2="22" y2="0" stroke="#1B241E" stroke-width="10" stroke-linecap="round" />
+  </g>
+  <!-- Bottom Right -->
+  <g transform="translate(892, 892)">
+    <circle r="46" fill="#B0BAAA" stroke="#1B241E" stroke-width="14" />
+    <circle r="26" fill="#D99E32" stroke="#1B241E" stroke-width="8" />
+    <line x1="0" y1="-22" x2="0" y2="22" stroke="#1B241E" stroke-width="10" stroke-linecap="round" />
+  </g>
+
+  <!-- Hazard Caution Bar (Top center) -->
+  <g transform="translate(262, 92)">
+    <rect width="500" height="24" rx="8" fill="#D99E32" stroke="#1B241E" stroke-width="8" />
+    <path d="M 40,0 L 70,24 M 100,0 L 130,24 M 160,0 L 190,24 M 220,0 L 250,24 M 280,0 L 310,24 M 340,0 L 370,24 M 400,0 L 430,24 M 460,0 L 490,24" stroke="#1B241E" stroke-width="12" stroke-linecap="square" />
+  </g>
+
+  <!-- Center Tactile 3D Keycap Module -->
+  <!-- 3D Shadow Layer -->
+  <rect x="212" y="270" width="600" height="524" rx="64" fill="#161D18" />
+  <rect x="212" y="250" width="600" height="524" rx="64" fill="#2E3B33" stroke="#1B241E" stroke-width="22" />
+
+  <!-- Main Keycap Face -->
+  <rect x="212" y="220" width="600" height="514" rx="64" fill="#425246" stroke="#1B241E" stroke-width="24" />
+
+  <!-- Recessed Inner Keycap Chamfer -->
+  <rect x="246" y="254" width="532" height="446" rx="44" fill="#313E34" stroke="#1B241E" stroke-width="14" />
+
+  <!-- Recessed Sage LCD Display -->
+  <g transform="translate(284, 290)">
+    <rect x="0" y="8" width="456" height="206" rx="24" fill="#161D18" />
+    <rect x="0" y="0" width="456" height="206" rx="24" fill="#8FA893" stroke="#1B241E" stroke-width="16" />
+
+    <!-- Scanlines -->
+    <line x1="20" y1="42" x2="436" y2="42" stroke="#7E9682" stroke-width="2" />
+    <line x1="20" y1="84" x2="436" y2="84" stroke="#7E9682" stroke-width="2" />
+    <line x1="20" y1="126" x2="436" y2="126" stroke="#7E9682" stroke-width="2" />
+    <line x1="20" y1="168" x2="436" y2="168" stroke="#7E9682" stroke-width="2" />
+
+    <!-- Micro-Annunciators -->
+    <text x="32" y="44" font-family="monospace" font-size="22" font-weight="900" fill="#1B241E" opacity="0.85">DEG</text>
+    <text x="115" y="44" font-family="monospace" font-size="22" font-weight="900" fill="#1B241E" opacity="0.85">HEX</text>
+    <text x="340" y="44" font-family="monospace" font-size="22" font-weight="900" fill="#1B241E" opacity="0.85">64-BIT</text>
+
+    <!-- Main Bold LCD Readout -->
+    <text x="228" y="148" text-anchor="middle" font-family="monospace" font-size="92" font-weight="900" fill="#1B241E" letter-spacing="6">CB•09</text>
+  </g>
+
+  <!-- Tactile Push Button Array (Below LCD) -->
+  <!-- Key 1: Operator / Orange -->
+  <g transform="translate(288, 532)">
+    <rect x="0" y="12" width="126" height="126" rx="28" fill="#161D18" />
+    <rect x="0" y="0" width="126" height="126" rx="28" fill="#D96B27" stroke="#1B241E" stroke-width="14" />
+    <path d="M 63,38 L 63,88 M 38,63 L 88,63" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" />
+  </g>
+
+  <!-- Key 2: ALU / Sage Light -->
+  <g transform="translate(449, 532)">
+    <rect x="0" y="12" width="126" height="126" rx="28" fill="#161D18" />
+    <rect x="0" y="0" width="126" height="126" rx="28" fill="#8FA893" stroke="#1B241E" stroke-width="14" />
+    <text x="63" y="82" text-anchor="middle" font-family="monospace" font-size="66" font-weight="900" fill="#1B241E">⊻</text>
+  </g>
+
+  <!-- Key 3: Action / Gold -->
+  <g transform="translate(610, 532)">
+    <rect x="0" y="12" width="126" height="126" rx="28" fill="#161D18" />
+    <rect x="0" y="0" width="126" height="126" rx="28" fill="#D99E32" stroke="#1B241E" stroke-width="14" />
+    <path d="M 40,50 L 86,50 M 40,76 L 86,76" stroke="#1B241E" stroke-width="16" stroke-linecap="round" />
+  </g>
+
+  <!-- Bottom Stenciled Nameplate -->
+  <g transform="translate(512, 836)">
+    <text text-anchor="middle" font-family="monospace" font-size="34" font-weight="900" fill="#1B241E" letter-spacing="8">CRUNCHBOX // CB-09</text>
+    <text text-anchor="middle" y="44" font-family="monospace" font-size="20" font-weight="800" fill="#2E3B33" letter-spacing="4">HEAVY-DUTY FIELD GEAR</text>
+  </g>
+</svg>
