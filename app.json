@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "CrunchBox",
+    "slug": "crunchbox",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "crunchbox",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#D8D0C0"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.crunchbox.cb09"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2D5A3C"
+      },
+      "package": "com.crunchbox.cb09"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "app": {
+    "name": "CrunchBox",
+    "badge": "CB-09 FIELD UNIT",
+    "tagline": "Heavy-Duty Math & Money Gear",
+    "status_online": "FIELD UNIT CB-09 // ONLINE",
+    "status_ready": "0ms READY // OFFLINE VERIFIED"
+  },
+  "modes": {
+    "calc": "CALC",
+    "sci": "SCI",
+    "curr": "CURR",
+    "unit": "UNIT",
+    "tools": "TOOLS"
+  },
+  "calc": {
+    "send_to_curr": "SEND -> CURR",
+    "deg": "DEG",
+    "rad": "RAD",
+    "error": "ERROR"
+  },
+  "currency": {
+    "you_send": "YOU SEND",
+    "you_receive": "YOU RECEIVE",
+    "reference_rate": "Reference exchange rate · Updated {{date}}",
+    "stale_badge": "OFFLINE CACHE",
+    "saved_pairs": "SAVED CURRENCY PAIRS",
+    "no_saved_pairs": "Star any currency pair to save for quick 1-tap recall",
+    "popular_chips": "QUICK CURRENCIES",
+    "search_placeholder": "Search 165+ currencies (code, name, country)...",
+    "select_currency": "SELECT CURRENCY"
+  },
+  "units": {
+    "from": "FROM",
+    "to": "TO",
+    "categories": {
+      "LENGTH": "Length",
+      "WEIGHT": "Weight",
+      "TEMP": "Temp",
+      "AREA": "Area & Land",
+      "DATA": "Data",
+      "SPEED": "Speed"
+    },
+    "reference_formula": "Reference Conversion Rate",
+    "land_units_note": "Includes regional South Asian Bigha, Katha & Decimal"
+  },
+  "tools": {
+    "tabs": {
+      "tip": "TIP & SPLIT",
+      "discount": "DISCOUNT & TAX",
+      "loan": "LOAN EMI",
+      "bmi": "BMI GAUGE"
+    },
+    "tip": {
+      "bill_amount": "BILL AMOUNT",
+      "tip_percentage": "TIP PERCENT",
+      "guest_count": "GUEST COUNT",
+      "tip_total": "Total Tip",
+      "grand_total": "Total Bill",
+      "per_person_total": "Per Person Total",
+      "per_person_tip": "Per Person Tip"
+    },
+    "discount": {
+      "original_price": "ORIGINAL PRICE",
+      "discount_percent": "DISCOUNT %",
+      "tax_percent": "TAX / VAT %",
+      "savings": "Total Savings",
+      "price_after_discount": "Price After Discount",
+      "tax_amount": "Tax Amount",
+      "final_price": "Final Payable"
+    },
+    "loan": {
+      "principal": "LOAN PRINCIPAL",
+      "interest_rate": "ANNUAL INTEREST %",
+      "tenure_months": "TENURE (MONTHS)",
+      "monthly_emi": "Monthly EMI",
+      "total_interest": "Total Interest",
+      "total_payable": "Total Payable"
+    },
+    "bmi": {
+      "weight_kg": "WEIGHT (KG)",
+      "height_cm": "HEIGHT (CM)",
+      "bmi_score": "BMI SCORE",
+      "status": "Health Status",
+      "underweight": "Underweight (< 18.5)",
+      "normal": "Normal Weight (18.5 - 24.9)",
+      "overweight": "Overweight (25 - 29.9)",
+      "obese": "Obese (≥ 30)"
+    }
+  },
+  "tape": {
+    "title": "PAPER TAPE RECEIPT",
+    "tear_button": "TEAR TAPE",
+    "tap_hint": "Tap any receipt line to recall value into active calculator",
+    "empty": "No calculation receipts recorded yet.",
+    "verified_stamp": "VERIFIED BY CRUNCHBOX // FIELD UNIT CB-09"
+  },
+  "settings": {
+    "title": "HARDWARE SETTINGS",
+    "chassis_id": "CHASSIS SPEC: CB-09 FIELD UNIT",
+    "theme_title": "APPEARANCE MODE",
+    "theme_field": "Field Light (Default)",
+    "theme_tactical": "Tactical Dark",
+    "language_title": "SYSTEM LANGUAGE",
+    "language_en": "English",
+    "language_bn": "বাংলা",
+    "tactile_feedback": "TACTILE & AUDIO GEAR",
+    "sound_label": "Mechanical Switch Audio (Web Audio Synth)",
+    "haptics_label": "Haptic Switch Pulse (Mobile Haptics)",
+    "cache_title": "OFFLINE RATES CACHE",
+    "rates_count": "Cached Currencies: {{count}}",
+    "last_updated": "Last Synced: {{date}}",
+    "refresh_button": "FORCE REFRESH RATES",
+    "refreshing": "CONNECTING TO CDN...",
+    "disclaimer": "All exchange rates are reference rates only. CrunchBox runs 100% locally with zero cloud trackers."
+  }
+}
