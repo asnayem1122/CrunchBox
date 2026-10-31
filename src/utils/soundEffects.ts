@@ -105,16 +105,30 @@ export function playTearTapeSound(soundEnabled: boolean = true): void {
   }
 }
 
+export type HapticFeedbackTier = 'light' | 'medium' | 'heavy' | 'warning';
+
 /**
- * Triggers native haptic impact feedback on iOS/Android.
+ * Triggers native haptic impact or notification feedback on iOS/Android.
  */
 export async function triggerHaptic(
   hapticsEnabled: boolean = true,
-  style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Light
+  style: HapticFeedbackTier = 'light'
 ): Promise<void> {
   if (!hapticsEnabled) return;
   try {
-    await Haptics.impactAsync(style);
+    if (style === 'warning') {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+
+    let impactStyle = Haptics.ImpactFeedbackStyle.Light;
+    if (style === 'medium') {
+      impactStyle = Haptics.ImpactFeedbackStyle.Medium;
+    } else if (style === 'heavy') {
+      impactStyle = Haptics.ImpactFeedbackStyle.Heavy;
+    }
+
+    await Haptics.impactAsync(impactStyle);
   } catch {
     // Unsupported platform or Web fallback
   }
@@ -125,8 +139,9 @@ export async function triggerHaptic(
  */
 export function triggerTactileFeedback(
   soundEnabled: boolean = true,
-  hapticsEnabled: boolean = true
+  hapticsEnabled: boolean = true,
+  tier: HapticFeedbackTier = 'light'
 ): void {
   playMechanicalClick(soundEnabled);
-  triggerHaptic(hapticsEnabled);
+  triggerHaptic(hapticsEnabled, tier);
 }

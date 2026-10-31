@@ -1,4 +1,5 @@
 export type ThemeMode = 'field' | 'tactical';
+export type LcdBacklightMode = 'sage' | 'amber' | 'stealth';
 
 export interface ColorTokens {
   appBackground: string;
@@ -81,4 +82,30 @@ export const hardwareConstants = {
 
 export function getThemeTokens(mode: ThemeMode = 'field'): ColorTokens {
   return mode === 'tactical' ? tacticalDarkTokens : fieldLightTokens;
+}
+
+export function getLcdColors(tokens: ColorTokens, backlightMode: LcdBacklightMode = 'sage'): {
+  surface: string;
+  text: string;
+  border: string;
+} {
+  if (backlightMode === 'amber') {
+    return {
+      surface: '#EAB308',
+      text: '#1F1500',
+      border: tokens.inkBorder,
+    };
+  }
+  if (backlightMode === 'stealth') {
+    return {
+      surface: '#132217',
+      text: '#4ADE80',
+      border: tokens.inkBorder,
+    };
+  }
+  return {
+    surface: tokens.recessedLcd,
+    text: tokens.recessedLcdText,
+    border: tokens.inkBorder,
+  };
 }

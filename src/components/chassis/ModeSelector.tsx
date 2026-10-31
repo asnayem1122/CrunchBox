@@ -7,6 +7,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import {
   ThemeMode,
   getThemeTokens,
@@ -14,7 +15,7 @@ import {
 } from '../../utils/themeTokens';
 import { triggerTactileFeedback } from '../../utils/soundEffects';
 
-export type HardwareMode = 'CALC' | 'SCI' | 'CURR' | 'UNIT' | 'TOOLS';
+export type HardwareMode = 'CALC' | 'SCI' | 'DEV' | 'CURR' | 'UNIT' | 'TOOLS';
 
 export interface ModeSelectorProps {
   activeMode: HardwareMode;
@@ -25,12 +26,23 @@ export interface ModeSelectorProps {
   hapticsEnabled?: boolean;
 }
 
-const MODES: Array<{ id: HardwareMode; label: string; iconSymbol: string }> = [
-  { id: 'CALC', label: 'CALC', iconSymbol: '±' },
-  { id: 'SCI', label: 'SCI', iconSymbol: 'ƒx' },
-  { id: 'CURR', label: 'CURR', iconSymbol: '৳/$' },
-  { id: 'UNIT', label: 'UNIT', iconSymbol: '⇄' },
-  { id: 'TOOLS', label: 'TOOLS', iconSymbol: '⚙' },
+interface ModeDef {
+  id: HardwareMode;
+  labelKey: string;
+  defaultLabel: string;
+  iconSymbol: string;
+}
+
+const MODES_ROW1: ModeDef[] = [
+  { id: 'CALC', labelKey: 'modes.calc', defaultLabel: 'CALC', iconSymbol: '±' },
+  { id: 'SCI', labelKey: 'modes.sci', defaultLabel: 'SCI', iconSymbol: 'ƒx' },
+  { id: 'DEV', labelKey: 'modes.dev', defaultLabel: 'DEV', iconSymbol: '>_' },
+];
+
+const MODES_ROW2: ModeDef[] = [
+  { id: 'CURR', labelKey: 'modes.curr', defaultLabel: 'CURR', iconSymbol: '৳/$' },
+  { id: 'UNIT', labelKey: 'modes.unit', defaultLabel: 'UNIT', iconSymbol: '⇄' },
+  { id: 'TOOLS', labelKey: 'modes.tools', defaultLabel: 'TOOLS', iconSymbol: '⚙' },
 ];
 
 export const ModeSelector: React.FC<ModeSelectorProps> = ({
@@ -41,12 +53,67 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
   soundEnabled = true,
   hapticsEnabled = true,
 }) => {
+  const { t } = useTranslation();
   const tokens = getThemeTokens(themeMode);
 
   const handleSelect = (mode: HardwareMode) => {
     if (mode === activeMode) return;
-    triggerTactileFeedback(soundEnabled, hapticsEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
     onChangeMode(mode);
+  };
+
+  const renderTab = (item: ModeDef) => {
+    const isActive = item.id === activeMode;
+    const label = t(item.labelKey, item.defaultLabel);
+
+    return (
+      <Pressable
+        key={item.id}
+        accessible={true}
+        accessibilityRole="tab"
+        accessibilityLabel={`${label} mode`}
+        accessibilityState={{ selected: isActive }}
+        testID={`mode-tab-${item.id.toLowerCase()}`}
+        onPress={() => handleSelect(item.id)}
+        style={[
+          styles.tabButton,
+          {
+            backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
+            borderColor: tokens.inkBorder,
+            borderWidth: 2,
+            borderRadius: hardwareConstants.borderRadiusSm,
+            borderBottomWidth: isActive ? 2 : 4,
+            transform: [{ translateY: isActive ? 2 : 0 }],
+          },
+        ]}
+      >
+        <View style={styles.tabContentRow}>
+          {/* Status LED Pip */}
+          <View
+            style={[
+              styles.ledPip,
+              {
+                backgroundColor: isActive ? tokens.ledActive : tokens.ledInactive,
+                borderColor: tokens.inkBorder,
+              },
+            ]}
+          />
+          <Text
+            style={[
+              styles.tabLabel,
+              {
+                color: tokens.inkBorder,
+                fontWeight: isActive ? '900' : '700',
+              },
+            ]}
+            numberOfLines={1}
+            maxFontSizeMultiplier={1.2}
+          >
+            {item.iconSymbol} {label}
+          </Text>
+        </View>
+      </Pressable>
+    );
   };
 
   return (
@@ -62,61 +129,50 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
         style,
       ]}
     >
-      {MODES.map((item) => {
-        const isActive = item.id === activeMode;
-        return (
-          <Pressable
-            key={item.id}
-            onPress={() => handleSelect(item.id)}
-            style={[
-              styles.tabButton,
-              {
-                backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-                borderColor: tokens.inkBorder,
-                borderWidth: 1.8,
-                borderRadius: hardwareConstants.borderRadiusSm,
-                // Active looks pressed in, inactive has 3D pop
-                borderBottomWidth: isActive ? 1.8 : 3.5,
-                transform: [{ translateY: isActive ? 1.5 : 0 }],
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabLabel,
-                {
-                  color: tokens.inkBorder,
-                  fontWeight: isActive ? '900' : '700',
-                },
-              ]}
-              numberOfLines={1}
-            >
-              {item.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <View style={styles.matrixRow}>
+        {MODES_ROW1.map(renderTab)}
+      </View>
+      <View style={styles.matrixRow}>
+        {MODES_ROW2.map(renderTab)}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   deckContainer: {
-    flexDirection: 'row',
-    padding: 4,
-    gap: 4,
+    padding: 5,
+    gap: 5,
     width: '100%',
     marginVertical: 6,
   },
+  matrixRow: {
+    flexDirection: 'row',
+    gap: 5,
+    width: '100%',
+  },
   tabButton: {
     flex: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 2,
+    minHeight: 36,
+    paddingVertical: 5,
+    paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  tabContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  ledPip: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1,
+  },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
   },

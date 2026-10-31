@@ -5,10 +5,11 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Share,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
-import { Trash2, X } from 'lucide-react-native';
+import { Trash2, X, Star, Share2 } from 'lucide-react-native';
 import { CrunchBoxLogo } from './CrunchBoxLogo';
 import { useAppStore, PaperTapeEntry } from '../../store/useAppStore';
 import {
@@ -31,19 +32,72 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
 }) => {
   const { t } = useTranslation();
   const tokens = getThemeTokens(themeMode);
-  const { paperTape, tearTape, recallTapeEntry } = useAppStore();
+  const {
+    paperTape,
+    tearTape,
+    recallTapeEntry,
+    togglePinTapeEntry,
+    soundEnabled,
+    hapticsEnabled,
+  } = useAppStore();
 
   if (!isOpen) return null;
 
   const handleTear = () => {
-    playTearTapeSound();
+    playTearTapeSound(soundEnabled);
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'heavy');
     tearTape();
   };
 
   const handleRecall = (id: string) => {
-    triggerTactileFeedback();
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
     recallTapeEntry(id);
     onClose();
+  };
+
+  const handleTogglePin = (id: string, e: any) => {
+    e.stopPropagation?.();
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
+    togglePinTapeEntry(id);
+  };
+
+  const handleShareReceipt = async () => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
+    const dateStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    const border = '+====================================+';
+    const divider = '+------------------------------------+';
+    const lines = [
+      border,
+      '|    CRUNCHBOX // CB-09 FIELD LOG    |',
+      `| Date: ${dateStr} UTC       |`,
+      border,
+    ];
+
+    if (paperTape.length === 0) {
+      lines.push('| (No calculations recorded)         |');
+    } else {
+      paperTape.forEach((entry, idx) => {
+        const pinMark = entry.isPinned ? '[*]' : '   ';
+        lines.push(`| #${String(paperTape.length - idx).padStart(2, '0')} ${pinMark} ${entry.mode.padEnd(5)} |`);
+        lines.push(`|   ${entry.expression}`);
+        lines.push(`| = ${entry.result}`);
+        if (idx < paperTape.length - 1) lines.push(divider);
+      });
+    }
+
+    lines.push(border);
+    lines.push('| HARDWARE AUTH: VERIFIED CHECKSUM   |');
+    lines.push(border);
+
+    const asciiReceipt = lines.join('\n');
+    try {
+      await Share.share({
+        message: asciiReceipt,
+        title: 'CrunchBox CB-09 Field Receipt',
+      });
+    } catch {
+      // Fallback silently if share dismissed
+    }
   };
 
   return (
@@ -76,7 +130,7 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
 
         {/* Header Bar */}
         <View style={styles.headerRow}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={[styles.drawerTitle, { color: tokens.textPrimary }]}>
               {t('tape.title', 'PAPER TAPE RECEIPT')}
             </Text>
@@ -85,9 +139,37 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
             </Text>
           </View>
 
-          <Pressable onPress={onClose} style={styles.closeBtn}>
-            <X size={20} color={tokens.inkBorder} strokeWidth={2.8} />
-          </Pressable>
+          <View style={styles.headerRightActions}>
+            <Pressable
+              accessible={true}
+              accessibilityLabel="Share ASCII Receipt"
+              onPress={handleShareReceipt}
+              style={[
+                styles.iconBtn,
+                {
+                  backgroundColor: tokens.keypadSurface,
+                  borderColor: tokens.inkBorder,
+                },
+              ]}
+            >
+              <Share2 size={16} color={tokens.inkBorder} strokeWidth={2.4} />
+            </Pressable>
+
+            <Pressable
+              accessible={true}
+              accessibilityLabel="Close Drawer"
+              onPress={onClose}
+              style={[
+                styles.iconBtn,
+                {
+                  backgroundColor: tokens.keypadSurface,
+                  borderColor: tokens.inkBorder,
+                },
+              ]}
+            >
+              <X size={18} color={tokens.inkBorder} strokeWidth={2.6} />
+            </Pressable>
+          </View>
         </View>
 
         {/* Paper Tape Items List */}
@@ -109,16 +191,39 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
               return (
                 <Pressable
                   key={entry.id}
+                  accessible={true}
+                  accessibilityLabel={`Receipt #${paperTape.length - idx}: ${entry.expression} = ${entry.result}`}
                   onPress={() => handleRecall(entry.id)}
                   style={[
                     styles.receiptItem,
-                    { borderBottomColor: 'rgba(27, 36, 30, 0.15)' },
+                    {
+                      borderBottomColor: 'rgba(27, 36, 30, 0.15)',
+                      backgroundColor: entry.isPinned ? 'rgba(234, 179, 8, 0.12)' : 'transparent',
+                    },
                   ]}
                 >
-                  <View style={styles.receiptMeta}>
-                    <Text style={styles.receiptIndex}>#{paperTape.length - idx}</Text>
-                    <Text style={styles.receiptTime}>{timeStr}</Text>
+                  <View style={styles.receiptTopLine}>
+                    <View style={styles.receiptMeta}>
+                      <Text style={styles.receiptIndex}>#{paperTape.length - idx}</Text>
+                      <Text style={styles.receiptModeTag}>{entry.mode}</Text>
+                      <Text style={styles.receiptTime}>{timeStr}</Text>
+                    </View>
+
+                    <Pressable
+                      accessible={true}
+                      accessibilityLabel={entry.isPinned ? 'Unpin entry' : 'Pin entry'}
+                      onPress={(e) => handleTogglePin(entry.id, e)}
+                      style={styles.pinBtn}
+                    >
+                      <Star
+                        size={15}
+                        color={entry.isPinned ? '#CA8A04' : tokens.textMuted}
+                        fill={entry.isPinned ? '#CA8A04' : 'none'}
+                        strokeWidth={2}
+                      />
+                    </Pressable>
                   </View>
+
                   <View style={styles.receiptCalc}>
                     <Text style={[styles.receiptExpr, { color: tokens.textSecondary }]}>
                       {entry.expression} =
@@ -141,6 +246,8 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
         {/* Bottom Actions Bar */}
         <View style={styles.footerRow}>
           <Pressable
+            accessible={true}
+            accessibilityLabel="Tear Tape"
             onPress={handleTear}
             disabled={paperTape.length === 0}
             style={[
@@ -160,6 +267,8 @@ export const PaperTapeDrawer: React.FC<PaperTapeDrawerProps> = ({
           </Pressable>
 
           <Pressable
+            accessible={true}
+            accessibilityLabel="Close Drawer"
             onPress={onClose}
             style={[
               styles.doneBtn,
@@ -201,91 +310,119 @@ const styles = StyleSheet.create({
   perforatedTop: {
     width: '100%',
     height: 12,
+    backgroundColor: 'transparent',
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 6,
+    paddingBottom: 8,
     borderBottomWidth: 1.5,
     borderBottomColor: 'rgba(27, 36, 30, 0.2)',
   },
   drawerTitle: {
-    fontSize: 13,
-    fontWeight: '900',
+    fontSize: 14,
     fontFamily: 'monospace',
+    fontWeight: '900',
     letterSpacing: 1,
   },
   drawerSubtitle: {
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: 'monospace',
     marginTop: 2,
   },
-  closeBtn: {
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconBtn: {
     padding: 6,
+    borderRadius: 6,
+    borderWidth: 1.5,
   },
   tapeScroll: {
-    maxHeight: 340,
+    maxHeight: 380,
+    paddingHorizontal: 16,
   },
   tapeContent: {
-    padding: 12,
+    paddingVertical: 8,
   },
   emptyContainer: {
-    paddingVertical: 32,
+    paddingVertical: 40,
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'monospace',
     fontStyle: 'italic',
   },
   receiptItem: {
-    paddingVertical: 7,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    borderRadius: 4,
     borderBottomWidth: 1,
+    marginBottom: 4,
+  },
+  receiptTopLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   receiptMeta: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 2,
+    alignItems: 'center',
+    gap: 8,
   },
   receiptIndex: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    fontWeight: '800',
+    color: '#D93829',
+  },
+  receiptModeTag: {
     fontSize: 9,
     fontFamily: 'monospace',
-    fontWeight: 'bold',
-    opacity: 0.6,
+    fontWeight: '700',
+    backgroundColor: 'rgba(27, 36, 30, 0.1)',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 2,
   },
   receiptTime: {
     fontSize: 9,
     fontFamily: 'monospace',
-    opacity: 0.6,
+    color: '#7D8A80',
+  },
+  pinBtn: {
+    padding: 3,
   },
   receiptCalc: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   receiptExpr: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'monospace',
-    fontWeight: '600',
-    flex: 1,
+    opacity: 0.8,
   },
   receiptResult: {
     fontSize: 16,
     fontFamily: 'monospace',
     fontWeight: '900',
+    marginTop: 1,
   },
   stampWrapper: {
     alignItems: 'center',
-    marginTop: 18,
-    marginBottom: 6,
+    paddingVertical: 16,
+    opacity: 0.85,
   },
   footerRow: {
     flexDirection: 'row',
-    gap: 8,
-    padding: 10,
+    padding: 12,
+    gap: 10,
     borderTopWidth: 1.5,
     borderTopColor: 'rgba(27, 36, 30, 0.2)',
   },
@@ -294,28 +431,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
     paddingVertical: 10,
-    borderRadius: 6,
+    borderRadius: 8,
+    gap: 6,
   },
   tearBtnText: {
     color: '#FFFDF7',
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'monospace',
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   doneBtn: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   doneBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'monospace',
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
 });
