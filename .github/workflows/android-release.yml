@@ -1,0 +1,197 @@
+name: Android Automated Release & Distribution
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Git Tag (e.g. v1.1.0)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, Sign, Verify & Publish APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve Release Tag
+        id: tag_resolver
+        run: |
+          if [ -n "${{ inputs.release_tag }}" ]; then
+            TAG="${{ inputs.release_tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          echo "Resolved release tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Checkout Source Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ steps.tag_resolver.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Setup Java JDK 17 (Temurin)
+        uses: actions/setup-java@86284260f829c66cb9e518619f406c69aca5500a # v4.6.1
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Run TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: Run Complete Jest Test Suite
+        run: npm test
+
+      - name: Verify Deterministic Version Synchronization
+        run: node scripts/verify-version-sync.js --tag "${{ steps.tag_resolver.outputs.tag }}"
+
+      - name: Inject Release Signing Keystore & Configuration
+        env:
+          KEYSTORE_BASE64: ${{ secrets.CRUNCHBOX_RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.CRUNCHBOX_RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.CRUNCHBOX_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.CRUNCHBOX_RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$STORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Missing required release signing secrets! Ensure CRUNCHBOX_RELEASE_KEYSTORE_BASE64, CRUNCHBOX_RELEASE_STORE_PASSWORD, CRUNCHBOX_RELEASE_KEY_ALIAS, and CRUNCHBOX_RELEASE_KEY_PASSWORD are set."
+            exit 1
+          fi
+
+          echo "Decoding release keystore to android/app/crunchbox-release-key.jks..."
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/crunchbox-release-key.jks
+          chmod 600 android/app/crunchbox-release-key.jks
+
+          echo "Generating android/keystore.properties..."
+          cat <<EOF > android/keystore.properties
+          CRUNCHBOX_RELEASE_STORE_FILE=crunchbox-release-key.jks
+          CRUNCHBOX_RELEASE_STORE_PASSWORD=$STORE_PASSWORD
+          CRUNCHBOX_RELEASE_KEY_ALIAS=$KEY_ALIAS
+          CRUNCHBOX_RELEASE_KEY_PASSWORD=$KEY_PASSWORD
+          EOF
+          chmod 600 android/keystore.properties
+          echo "Keystore and configuration successfully provisioned."
+
+      - name: Build Standalone Release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Verify APK Signature, Identity & Production Certificate
+        env:
+          EXPECTED_TAG: ${{ steps.tag_resolver.outputs.tag }}
+        run: |
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          echo "Using Android Build Tools at: $BUILD_TOOLS_DIR"
+          AAPT2="$BUILD_TOOLS_DIR/aapt2"
+          APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
+
+          APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::Release APK not found at $APK_PATH"
+            exit 1
+          fi
+
+          echo "=== 1. Validating Package Metadata (aapt2) ==="
+          BADGING=$("$AAPT2" dump badging "$APK_PATH")
+
+          # Validate Package Name
+          echo "$BADGING" | grep "package: name='com.crunchbox.cb09'" || {
+            echo "::error::Package name is not com.crunchbox.cb09"
+            exit 1
+          }
+
+          VERSION_CLEAN="${EXPECTED_TAG#v}"
+          echo "$BADGING" | grep "versionName='$VERSION_CLEAN'" || {
+            echo "::error::versionName does not match expected $VERSION_CLEAN"
+            exit 1
+          }
+          echo "Package ID and versionName '$VERSION_CLEAN' verified."
+
+          echo "=== 2. Validating Cryptographic Signature (apksigner) ==="
+          "$APKSIGNER" verify --verbose --print-certs "$APK_PATH" > /tmp/apk_cert.txt
+
+          # Check for forbidden debug signature
+          if grep -i "CN=Android Debug" /tmp/apk_cert.txt; then
+            echo "::error::SECURITY ALERT: APK was signed with Android Debug certificate!"
+            exit 1
+          fi
+
+          # Verify Production SHA-256 Fingerprint
+          EXPECTED_SHA256="55583f2d136760ff151b89c60f8e9822062d673777bd6b8749b00729943f550c"
+          RAW_SHA256=$(grep -i "certificate SHA-256 digest" /tmp/apk_cert.txt | head -n 1 | awk '{print $NF}')
+          NORMALIZED_SHA256=$(echo "$RAW_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')
+
+          echo "Expected SHA-256: $EXPECTED_SHA256"
+          echo "Actual SHA-256:   $NORMALIZED_SHA256"
+
+          if [ "$NORMALIZED_SHA256" != "$EXPECTED_SHA256" ]; then
+            echo "::error::Certificate SHA-256 fingerprint mismatch!"
+            exit 1
+          fi
+
+          echo "✅ Production certificate signature verified successfully!"
+
+      - name: Package Artifacts and Compute SHA256 Checksums
+        id: package_artifacts
+        run: |
+          TAG="${{ steps.tag_resolver.outputs.tag }}"
+          ARTIFACT_NAME="CrunchBox-CB09-${TAG}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$ARTIFACT_NAME"
+
+          echo "Calculating SHA-256 checksum..."
+          sha256sum "$ARTIFACT_NAME" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+          echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Upload APK Artifact to Workflow Run
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: ${{ steps.package_artifacts.outputs.artifact_name }}
+          path: ${{ steps.package_artifacts.outputs.artifact_name }}
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag_resolver.outputs.tag }}
+          ARTIFACT_NAME: ${{ steps.package_artifacts.outputs.artifact_name }}
+        run: |
+          echo "Publishing release $TAG..."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Uploading and clobbering release assets..."
+            gh release upload "$TAG" "$ARTIFACT_NAME" SHA256SUMS.txt --clobber
+          else
+            echo "Creating new GitHub release for $TAG..."
+            gh release create "$TAG" "$ARTIFACT_NAME" SHA256SUMS.txt \
+              --title "CrunchBox (CB-09 FIELD UNIT) $TAG" \
+              --generate-notes
+          fi
+          echo "Release publication completed successfully."
+
+      - name: Security Cleanup
+        if: always()
+        run: |
+          echo "Executing security cleanup of temporary signing credentials..."
+          rm -f android/keystore.properties
+          rm -f android/app/crunchbox-release-key.jks
+          rm -f /tmp/apk_cert.txt
+          echo "Sensitive signing files securely removed."

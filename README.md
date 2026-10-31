@@ -8,8 +8,49 @@
 [![Expo - SDK 52](https://img.shields.io/badge/Expo-SDK%2052-1B241E?style=for-the-badge&logo=expo)](https://expo.dev/)
 [![React Native - 0.76](https://img.shields.io/badge/React%20Native-0.76.6-61DAFB?style=for-the-badge&logo=react)](https://reactnative.dev/)
 [![TypeScript - 5.3](https://img.shields.io/badge/TypeScript-5.3%20Strict-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tests - 132 Passed](https://img.shields.io/badge/Tests-154%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
+[![Tests - 154 Passed](https://img.shields.io/badge/Tests-154%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
+[![Latest APK Release](https://img.shields.io/github/v/release/asnayem1122/CrunchBox?label=Download%20Latest%20APK&style=for-the-badge&logo=android&color=22C55E)](https://github.com/asnayem1122/CrunchBox/releases/latest)
 [![License - MIT](https://img.shields.io/badge/License-MIT-D99E32?style=for-the-badge)](LICENSE)
+
+---
+
+## 📦 Download Latest Release (Standalone Android APK)
+
+Get the official standalone build of **CrunchBox (`CB-09 FIELD UNIT`)** directly from GitHub Releases:
+
+[![Direct Download v1.1.0 APK](https://img.shields.io/badge/Download-CrunchBox%20v1.1.0%20APK%20(64%20MB)-22C55E?style=for-the-badge&logo=android)](https://github.com/asnayem1122/CrunchBox/releases/latest)
+
+> **Current Stable Release:** **`v1.1.0`** (`versionCode: 2`, 64.2 MB)  
+> **Direct Release Page:** [https://github.com/asnayem1122/CrunchBox/releases/latest](https://github.com/asnayem1122/CrunchBox/releases/latest)
+
+### 📲 Non-Technical Installation & Upgrade Guide
+
+1. **Download:** Tap the button above or download `CrunchBox-CB09-v1.1.0.apk` to your Android phone.
+2. **Install:** Tap the downloaded `.apk` in your notifications or File Manager.
+   - *First-time install?* If Android displays a prompt saying *"For your security, your phone is not allowed to install unknown apps from this source"*, tap **Settings** and toggle **Allow from this source**, then tap **Install**.
+   - *Google Play Protect alert?* Since CrunchBox is open-source hardware software distributed directly via GitHub rather than the Play Store, tap **More details** followed by **Install anyway**.
+3. **In-Place Upgrades:** When updating from `v1.0.0` to `v1.1.0+`, the update installs directly over the existing app. All paper tape receipts, stored memory values, and customized backlight settings are preserved!
+
+### 🔒 Cryptographic Authenticity & Integrity Verification
+
+Every official CrunchBox APK is signed with the official CB-09 Hardware Labs release key. Verify your download:
+
+| Attribute | Official Production Value |
+| :--- | :--- |
+| **Package ID** | `com.crunchbox.cb09` |
+| **Certificate DN** | `CN=CrunchBox Engineering, OU=CB09 Hardware Labs, O=CrunchBox, L=Dhaka, ST=Dhaka, C=BD` |
+| **Certificate SHA-256** | `55:58:3F:2D:13:67:60:FF:15:1B:89:C6:0F:8E:98:22:06:2D:67:37:77:BD:6B:87:49:B0:07:29:94:3F:55:0C` |
+
+Verify the SHA-256 file checksum against `SHA256SUMS.txt`:
+```bash
+# Windows PowerShell
+certutil -hashfile CrunchBox-CB09-v1.1.0.apk SHA256
+
+# Linux / macOS / Android Termux
+sha256sum CrunchBox-CB09-v1.1.0.apk
+```
+
+> For automated CI/CD release mechanics and maintainer instructions, see [**`docs/RELEASING.md`**](docs/RELEASING.md).
 
 ---
 

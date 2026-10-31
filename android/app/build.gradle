@@ -100,6 +100,36 @@ android {
         keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
     }
 
+    def getReleaseProp = { String key ->
+        return keystoreProperties[key] ?: System.getenv(key) ?: findProperty(key)
+    }
+
+    def releaseStoreFile = getReleaseProp('CRUNCHBOX_RELEASE_STORE_FILE')
+    def releaseStorePassword = getReleaseProp('CRUNCHBOX_RELEASE_STORE_PASSWORD')
+    def releaseKeyAlias = getReleaseProp('CRUNCHBOX_RELEASE_KEY_ALIAS')
+    def releaseKeyPassword = getReleaseProp('CRUNCHBOX_RELEASE_KEY_PASSWORD')
+
+    def isReleaseTaskRequested = gradle.startParameter.taskNames.any { name ->
+        name.toLowerCase().contains("release")
+    }
+
+    if (isReleaseTaskRequested) {
+        def missing = []
+        if (!releaseStoreFile) missing.add("CRUNCHBOX_RELEASE_STORE_FILE")
+        if (!releaseStorePassword) missing.add("CRUNCHBOX_RELEASE_STORE_PASSWORD")
+        if (!releaseKeyAlias) missing.add("CRUNCHBOX_RELEASE_KEY_ALIAS")
+        if (!releaseKeyPassword) missing.add("CRUNCHBOX_RELEASE_KEY_PASSWORD")
+
+        if (!missing.isEmpty()) {
+            throw new GradleException("CRITICAL: Release build requested, but missing release signing credentials: " + missing.join(', ') + ". Configure them in android/keystore.properties or as environment variables.")
+        }
+
+        def resolvedStoreFile = file(releaseStoreFile)
+        if (!resolvedStoreFile.exists()) {
+            throw new GradleException("CRITICAL: Release keystore file not found at: " + resolvedStoreFile.absolutePath)
+        }
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -108,13 +138,11 @@ android {
             keyPassword 'android'
         }
         release {
-            if (keystorePropertiesFile.exists() && keystoreProperties['CRUNCHBOX_RELEASE_STORE_FILE']) {
-                storeFile file(keystoreProperties['CRUNCHBOX_RELEASE_STORE_FILE'])
-                storePassword keystoreProperties['CRUNCHBOX_RELEASE_STORE_PASSWORD']
-                keyAlias keystoreProperties['CRUNCHBOX_RELEASE_KEY_ALIAS']
-                keyPassword keystoreProperties['CRUNCHBOX_RELEASE_KEY_PASSWORD']
-            } else {
-                signingConfig signingConfigs.debug
+            if (releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
             }
         }
     }
@@ -123,7 +151,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.release
+            signingConfig releaseStoreFile ? signingConfigs.release : null
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
