@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { X, RefreshCw, Volume2, Smartphone } from 'lucide-react-native';
+import { X, RefreshCw, Volume2, Smartphone, BookOpen, Activity } from 'lucide-react-native';
 import { CrunchBoxLogo } from '../components/chassis/CrunchBoxLogo';
 import { useAppStore } from '../store/useAppStore';
 import {
@@ -36,6 +36,8 @@ export default function SettingsScreen() {
     ratesFetchedAt,
     exchangeRates,
     refreshExchangeRates,
+    setGuidebookOpen,
+    setDiagnosticsOpen,
   } = useAppStore();
 
   const tokens = getThemeTokens(themeMode);
@@ -71,7 +73,7 @@ export default function SettingsScreen() {
             styles.headerBar,
             {
               backgroundColor: tokens.chassisSurface,
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible,
               borderWidth: hardwareConstants.borderWidth,
             },
           ]}
@@ -80,19 +82,24 @@ export default function SettingsScreen() {
             {t('settings.title', 'HARDWARE SETTINGS')}
           </Text>
 
-          <Pressable onPress={() => router.back()} style={styles.closeBtn}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.closeBtn}
+            hitSlop={8}
+            accessibilityLabel="Close settings"
+          >
             <X size={20} color="#FFFDF7" strokeWidth={2.8} />
           </Pressable>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Brand Hero Hardware Card */}
           <View
             style={[
               styles.heroCard,
               {
                 backgroundColor: tokens.chassisSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: hardwareConstants.borderWidthHeavy,
               },
             ]}
@@ -115,7 +122,7 @@ export default function SettingsScreen() {
               styles.sectionCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -135,7 +142,7 @@ export default function SettingsScreen() {
                       themeMode === 'field'
                         ? tokens.accentOps
                         : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.8,
                   },
                 ]}
@@ -144,7 +151,10 @@ export default function SettingsScreen() {
                   style={[
                     styles.segmentText,
                     {
-                      color: tokens.inkBorder,
+                      color:
+                        themeMode === 'field'
+                          ? tokens.keycapOperatorText
+                          : tokens.keycapNumberText,
                       fontWeight: themeMode === 'field' ? '900' : '600',
                     },
                   ]}
@@ -164,7 +174,7 @@ export default function SettingsScreen() {
                       themeMode === 'tactical'
                         ? tokens.accentOps
                         : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.8,
                   },
                 ]}
@@ -173,7 +183,10 @@ export default function SettingsScreen() {
                   style={[
                     styles.segmentText,
                     {
-                      color: tokens.inkBorder,
+                      color:
+                        themeMode === 'tactical'
+                          ? tokens.keycapOperatorText
+                          : tokens.keycapNumberText,
                       fontWeight: themeMode === 'tactical' ? '900' : '600',
                     },
                   ]}
@@ -190,7 +203,7 @@ export default function SettingsScreen() {
               styles.sectionCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -208,7 +221,7 @@ export default function SettingsScreen() {
                       language === 'en'
                         ? tokens.accentOps
                         : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.8,
                   },
                 ]}
@@ -217,7 +230,10 @@ export default function SettingsScreen() {
                   style={[
                     styles.segmentText,
                     {
-                      color: tokens.inkBorder,
+                      color:
+                        language === 'en'
+                          ? tokens.keycapOperatorText
+                          : tokens.keycapNumberText,
                       fontWeight: language === 'en' ? '900' : '600',
                     },
                   ]}
@@ -235,7 +251,7 @@ export default function SettingsScreen() {
                       language === 'bn'
                         ? tokens.accentOps
                         : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.8,
                   },
                 ]}
@@ -244,7 +260,10 @@ export default function SettingsScreen() {
                   style={[
                     styles.segmentText,
                     {
-                      color: tokens.inkBorder,
+                      color:
+                        language === 'bn'
+                          ? tokens.keycapOperatorText
+                          : tokens.keycapNumberText,
                       fontWeight: language === 'bn' ? '900' : '600',
                     },
                   ]}
@@ -261,7 +280,7 @@ export default function SettingsScreen() {
               styles.sectionCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -272,7 +291,7 @@ export default function SettingsScreen() {
 
             <View style={styles.switchRow}>
               <View style={styles.switchLabelGroup}>
-                <Volume2 size={16} color={tokens.inkBorder} />
+                <Volume2 size={16} color={tokens.textPrimary} />
                 <Text style={[styles.switchLabel, { color: tokens.textPrimary }]}>
                   {t('settings.sound_label', 'Mechanical Switch Audio')}
                 </Text>
@@ -287,7 +306,7 @@ export default function SettingsScreen() {
 
             <View style={styles.switchRow}>
               <View style={styles.switchLabelGroup}>
-                <Smartphone size={16} color={tokens.inkBorder} />
+                <Smartphone size={16} color={tokens.textPrimary} />
                 <Text style={[styles.switchLabel, { color: tokens.textPrimary }]}>
                   {t('settings.haptics_label', 'Haptic Switch Pulse')}
                 </Text>
@@ -301,13 +320,13 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Exchange Rates Cache Deck */}
+          {/* Offline Rates Cache Deck */}
           <View
             style={[
               styles.sectionCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -336,14 +355,14 @@ export default function SettingsScreen() {
                 styles.refreshBtn,
                 {
                   backgroundColor: tokens.accentOps,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible,
                   borderWidth: 2,
                   opacity: isRefreshing ? 0.6 : 1,
                 },
               ]}
             >
-              <RefreshCw size={15} color={tokens.inkBorder} strokeWidth={2.8} />
-              <Text style={[styles.refreshBtnText, { color: tokens.inkBorder }]}>
+              <RefreshCw size={15} color={tokens.keycapOperatorText} strokeWidth={2.8} />
+              <Text style={[styles.refreshBtnText, { color: tokens.keycapOperatorText }]}>
                 {isRefreshing
                   ? t('settings.refreshing', 'CONNECTING TO CDN...')
                   : t('settings.refresh_button', 'FORCE REFRESH RATES')}
@@ -356,6 +375,63 @@ export default function SettingsScreen() {
                 'All exchange rates are reference rates only. CrunchBox runs 100% locally with zero cloud trackers.'
               )}
             </Text>
+          </View>
+          {/* Hardware Manual & Diagnostics Deck */}
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: tokens.innerPanel,
+                borderColor: tokens.borderVisible,
+                borderWidth: hardwareConstants.borderWidth,
+              },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: tokens.textSecondary }]}>
+              {t('settings.manual_title', 'DOCUMENTATION & SELF-TEST')}
+            </Text>
+
+            <Pressable
+              onPress={() => {
+                triggerTactileFeedback();
+                router.back();
+                setTimeout(() => setGuidebookOpen(true), 150);
+              }}
+              style={[
+                styles.refreshBtn,
+                {
+                  backgroundColor: tokens.keypadSurface,
+                  borderColor: tokens.borderVisible,
+                  borderWidth: 1.8,
+                },
+              ]}
+            >
+              <BookOpen size={15} color={tokens.accentOps} strokeWidth={2.4} />
+              <Text style={[styles.refreshBtnText, { color: tokens.textPrimary }]}>
+                {t('settings.open_manual', 'OPEN HARDWARE MANUAL (📖 GUIDE)')}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                triggerTactileFeedback();
+                router.back();
+                setTimeout(() => setDiagnosticsOpen(true), 150);
+              }}
+              style={[
+                styles.refreshBtn,
+                {
+                  backgroundColor: tokens.keypadSurface,
+                  borderColor: tokens.borderVisible,
+                  borderWidth: 1.8,
+                },
+              ]}
+            >
+              <Activity size={15} color={tokens.actionGreen} strokeWidth={2.4} />
+              <Text style={[styles.refreshBtnText, { color: tokens.textPrimary }]}>
+                {t('settings.run_diagnostics', 'RUN 15-POINT SELF-TEST (QA)')}
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </View>

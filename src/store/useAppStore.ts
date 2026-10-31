@@ -7,6 +7,8 @@ import {
   evaluateExpression,
   AngleMode,
   formatCalcNumber,
+  decimalToFraction,
+  primeFactorize,
 } from '../features/calculator/calcEngine';
 import { BUNDLED_RATES_USD } from '../features/currency/bundledRates';
 import { fetchExchangeRates } from '../services/exchange-rate/api';
@@ -45,13 +47,20 @@ export interface AppState {
   soundEnabled: boolean;
   hapticsEnabled: boolean;
 
-  // Calculator State
+    // Calculator State
   calcExpression: string;
   calcResult: string;
   calcMemory: number;
   angleMode: AngleMode;
   calcError: string | null;
+  fractionMode: 'DEC' | 'FRAC' | 'MIXED';
+  fractionDisplay: string | null;
+  primeFactorsDisplay: string | null;
   paperTape: PaperTapeEntry[];
+
+  // Modals & Overlays
+  isGuidebookOpen: boolean;
+  isDiagnosticsOpen: boolean;
 
   // Currency Converter State
   fromCurrency: string;
@@ -93,11 +102,13 @@ export interface AppState {
   toggleSound: () => void;
   toggleHaptics: () => void;
 
-  // Actions: Calculator
+    // Actions: Calculator
   inputCalcKey: (key: string) => void;
   evaluateCalc: () => void;
   clearCalc: () => void;
   deleteCalcLast: () => void;
+  cycleFractionMode: () => void;
+  primeFactorizeCalc: () => void;
   toggleAngleMode: () => void;
   memoryAdd: () => void;
   memorySubtract: () => void;
@@ -105,11 +116,17 @@ export interface AppState {
   memoryClear: () => void;
   sendCalcToCurrency: () => void;
 
+  // Actions: Modals
+  setGuidebookOpen: (open: boolean) => void;
+  setDiagnosticsOpen: (open: boolean) => void;
+
   // Actions: Paper Tape
   addPaperTapeEntry: (entry: Omit<PaperTapeEntry, 'id' | 'timestamp'>) => void;
   tearTape: () => void;
   recallTapeEntry: (id: string) => void;
   togglePinTapeEntry: (id: string) => void;
+  deleteTapeEntry: (id: string) => void;
+  loadTapeToCalc: (entry: PaperTapeEntry, useAnsOnly?: boolean) => void;
 
   // Actions: Currency
   setCurrencies: (from: string, to: string) => void;
@@ -185,13 +202,20 @@ export const useAppStore = create<AppState>()(
       soundEnabled: true,
       hapticsEnabled: true,
 
-      // Calculator Defaults
+            // Calculator Defaults
       calcExpression: '',
       calcResult: '0',
       calcMemory: 0,
       angleMode: 'deg',
       calcError: null,
+      fractionMode: 'DEC',
+      fractionDisplay: null,
+      primeFactorsDisplay: null,
       paperTape: [],
+
+      // Modals
+      isGuidebookOpen: false,
+      isDiagnosticsOpen: false,
 
       // Currency Defaults
       fromCurrency: 'USD',
@@ -264,7 +288,7 @@ export const useAppStore = create<AppState>()(
 
       toggleHaptics: () => set((state) => ({ hapticsEnabled: !state.hapticsEnabled })),
 
-      // Calculator Actions
+            // Calculator Actions
       inputCalcKey: (key) =>
         set((state) => {
           if (state.calcError) {
@@ -272,10 +296,18 @@ export const useAppStore = create<AppState>()(
               calcError: null,
               calcExpression: key,
               calcResult: key,
+              fractionMode: 'DEC',
+              fractionDisplay: null,
+              primeFactorsDisplay: null,
             };
           }
           const nextExpr = state.calcExpression + key;
-          return { calcExpression: nextExpr };
+          return {
+            calcExpression: nextExpr,
+            fractionMode: 'DEC',
+            fractionDisplay: null,
+            primeFactorsDisplay: null,
+          };
         }),
 
       evaluateCalc: () => {
@@ -298,6 +330,9 @@ export const useAppStore = create<AppState>()(
             calcResult: formatted,
             calcExpression: '',
             calcError: null,
+            fractionMode: 'DEC',
+            fractionDisplay: null,
+            primeFactorsDisplay: null,
           });
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : 'Error';
@@ -310,18 +345,63 @@ export const useAppStore = create<AppState>()(
           calcExpression: '',
           calcResult: '0',
           calcError: null,
+          fractionMode: 'DEC',
+          fractionDisplay: null,
+          primeFactorsDisplay: null,
         }),
 
       deleteCalcLast: () =>
         set((state) => {
           if (state.calcError) {
-            return { calcError: null, calcResult: '0' };
+            return {
+              calcError: null,
+              calcResult: '0',
+              fractionMode: 'DEC',
+              fractionDisplay: null,
+              primeFactorsDisplay: null,
+            };
           }
           if (state.calcExpression.length > 0) {
-            return { calcExpression: state.calcExpression.slice(0, -1) };
+            return {
+              calcExpression: state.calcExpression.slice(0, -1),
+              fractionMode: 'DEC',
+              fractionDisplay: null,
+              primeFactorsDisplay: null,
+            };
           }
           return {};
         }),
+
+      cycleFractionMode: () => {
+        const { calcResult, fractionMode } = get();
+        const num = parseFloat(calcResult.replace(/,/g, ''));
+        if (Number.isNaN(num) || !Number.isFinite(num)) return;
+        const frac = decimalToFraction(num);
+        if (!frac) return;
+
+        const nextMode =
+          fractionMode === 'DEC' ? 'FRAC' : fractionMode === 'FRAC' ? 'MIXED' : 'DEC';
+
+        let display: string | null = null;
+        if (nextMode === 'FRAC') display = frac.displayFrac;
+        else if (nextMode === 'MIXED') display = frac.displayMixed;
+        else display = null;
+
+        set({ fractionMode: nextMode, fractionDisplay: display });
+      },
+
+      primeFactorizeCalc: () => {
+        const { calcResult } = get();
+        const num = parseFloat(calcResult.replace(/,/g, ''));
+        const fact = primeFactorize(num);
+        if (fact) {
+          set({ primeFactorsDisplay: fact });
+        }
+      },
+
+      // Modal Actions
+      setGuidebookOpen: (open) => set({ isGuidebookOpen: open }),
+      setDiagnosticsOpen: (open) => set({ isDiagnosticsOpen: open }),
 
       toggleAngleMode: () =>
         set((state) => ({
@@ -418,6 +498,33 @@ export const useAppStore = create<AppState>()(
             item.id === id ? { ...item, isPinned: !item.isPinned } : item
           ),
         })),
+
+      deleteTapeEntry: (id) =>
+        set((state) => ({
+          paperTape: state.paperTape.filter((item) => item.id !== id),
+        })),
+
+      loadTapeToCalc: (entry, useAnsOnly = false) =>
+        set((state) => {
+          if (useAnsOnly) {
+            const nextExpr = state.calcExpression ? state.calcExpression + entry.result : entry.result;
+            return {
+              calcExpression: nextExpr,
+              fractionMode: 'DEC',
+              fractionDisplay: null,
+              primeFactorsDisplay: null,
+              activeMode: 'CALC',
+            };
+          }
+          return {
+            calcExpression: entry.expression,
+            calcResult: entry.result,
+            fractionMode: 'DEC',
+            fractionDisplay: null,
+            primeFactorsDisplay: null,
+            activeMode: 'CALC',
+          };
+        }),
 
       // Currency Actions
       setCurrencies: (from, to) =>

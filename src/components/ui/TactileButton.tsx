@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   Pressable,
   View,
@@ -37,9 +37,10 @@ export interface TactileButtonProps {
   textStyle?: StyleProp<TextStyle>;
   soundEnabled?: boolean;
   hapticsEnabled?: boolean;
+  testID?: string;
 }
 
-export const TactileButton: React.FC<TactileButtonProps> = ({
+const TactileButtonComponent: React.FC<TactileButtonProps> = ({
   label,
   subtitle,
   variant = 'number',
@@ -54,35 +55,36 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
   textStyle,
   soundEnabled = true,
   hapticsEnabled = true,
+  testID,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const tokens = getThemeTokens(themeMode);
 
-  // Surface and text colors based on variant
+  // Surface and text colors based on semantic tokens
   let surfaceColor: string = tokens.keypadSurface;
-  let textColor: string = tokens.textPrimary;
+  let textColor: string = tokens.keycapNumberText;
 
   switch (variant) {
     case 'operator':
       surfaceColor = tokens.accentOps;
-      textColor = tokens.inkBorder;
+      textColor = tokens.keycapOperatorText;
       break;
     case 'danger':
       surfaceColor = tokens.dangerRed;
-      textColor = '#FFFDF7';
+      textColor = tokens.keycapDangerText;
       break;
     case 'action':
       surfaceColor = tokens.actionGreen;
-      textColor = '#FFFDF7';
+      textColor = tokens.keycapActionText;
       break;
     case 'secondary':
       surfaceColor = tokens.innerPanel;
-      textColor = tokens.textPrimary;
+      textColor = tokens.keycapSecondaryText;
       break;
     case 'number':
     default:
       surfaceColor = tokens.keypadSurface;
-      textColor = tokens.textPrimary;
+      textColor = tokens.keycapNumberText;
       break;
   }
 
@@ -117,6 +119,7 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
         },
         style,
       ]}
+      testID={testID}
     >
       {/* 1. Static 3D Shadow Plate - Fixed at bottom, NEVER resizes outer container */}
       <View
@@ -142,7 +145,7 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
           styles.keycapFace,
           {
             backgroundColor: surfaceColor,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible || tokens.inkBorder,
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
             height: keycapHeight,
@@ -180,6 +183,23 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
     </View>
   );
 };
+
+export const TactileButton = memo(TactileButtonComponent, (prev, next) => {
+  return (
+    prev.label === next.label &&
+    prev.subtitle === next.subtitle &&
+    prev.variant === next.variant &&
+    prev.disabled === next.disabled &&
+    prev.themeMode === next.themeMode &&
+    prev.height === next.height &&
+    prev.width === next.width &&
+    prev.flex === next.flex &&
+    prev.soundEnabled === next.soundEnabled &&
+    prev.hapticsEnabled === next.hapticsEnabled &&
+    prev.style === next.style &&
+    prev.textStyle === next.textStyle
+  );
+});
 
 const styles = StyleSheet.create({
   outerContainer: {

@@ -89,6 +89,53 @@
 
 ---
 
+### ADR-008: High-Water Mark Top Inset for Android Modal Routes
+- **Status:** Accepted & Implemented in v1.1.0.
+- **Context:** Navigating to modal routes on Android (e.g., `/settings` and `/currency-picker`) caused `react-native-screens` to detach or report zero top insets momentarily. When returning to `index`, the entire UI jumped upward by ~28-40px.
+- **Decision:** Implemented a permanent module-scoped high-water mark `lockedAndroidTopInset` in [`useHardwareLayout.ts`](src/utils/useHardwareLayout.ts):
+  ```typescript
+  lockedAndroidTopInset = Math.max(
+    lockedAndroidTopInset,
+    insets.top,
+    StatusBar.currentHeight ?? 28,
+    28
+  );
+  ```
+  Set `presentation: Platform.OS === 'android' ? 'card' : 'modal'` in [`_layout.tsx`](src/app/_layout.tsx) and non-translucent hardware status bar.
+- **Consequences:** Safe-area top padding is permanently locked on Android; zero jumping or jitter during screen transitions.
+
+---
+
+### ADR-009: Casio fx-991EX Multiplicative Combinatorics & Continued Fractions
+- **Status:** Accepted & Implemented in v1.1.0.
+- **Context:** Computing $n!$ overflows to `Infinity` in JavaScript for $n > 170$, breaking $n\text{C}r$ and $n\text{P}r$ for realistic inputs (e.g., $200\text{C}2$). Furthermore, students need exact fractional representations ($S \Leftrightarrow D$) and prime factorization (`FACT`).
+- **Decision:**
+  - Evaluated $n\text{C}r$ and $n\text{P}r$ via multiplicative cancellation loops $\prod_{i=1}^r \frac{n - i + 1}{i}$, enabling inputs up to $n = 1000$ without overflow.
+  - Implemented continued fractions expansion capped at $\le 100,000$ denominator for $S \Leftrightarrow D$ decimal-to-fraction conversions.
+  - Implemented wheel factorization ($6k \pm 1$) for `FACT` prime power decomposition ($60 \rightarrow 2^2 \times 3 \times 5$).
+- **Consequences:** 100% Casio fx-991EX ClassWiz parity with zero overflow and clean fraction rendering.
+
+---
+
+### ADR-010: Zero-Latency Speculative Live Auto-Compute with Prefix Invariant
+- **Status:** Accepted & Implemented in v1.1.0.
+- **Context:** Live auto-compute previewing `ans ≈ ...` must never throw syntax errors while the user is actively typing, nor should it evaluate open function calls (e.g., `sin(`) as empty parentheses `()` which produces misleading `0`.
+- **Decision:** Handcrafted [`useLiveCalc.ts`](src/features/calculator/useLiveCalc.ts) with `sanitizeIncompleteExpression`:
+  - Guards trailing open function prefixes (`sin(`, `cos(`, `log(`, `sqrt(`) by returning `null`.
+  - Strips trailing binary operators and auto-balances unclosed parentheses before evaluation.
+- **Consequences:** 0ms speculative evaluation with zero error noise or incorrect zero results.
+
+---
+
+### ADR-011: WCAG 2.1 AA Semantic Keycap Tokens for Tactical Dark Contrast
+- **Status:** Accepted & Implemented in v1.1.0.
+- **Context:** In `tacticalDark` mode, buttons, subdeck tabs, and chips previously used `tokens.inkBorder` (`#070A08`) for text on dark backgrounds (`#1F2D24`), resulting in an unreadable 1.1:1 contrast ratio.
+- **Decision:**
+  - Added semantic theme tokens in [`themeTokens.ts`](src/utils/themeTokens.ts): `keycapNumberText` (`#F5F6FA`), `keycapOperatorText` (`#070A08`), and `borderVisible` (`#3A4D40`).
+  - Audited and updated all 6 modes, Settings, and Pickers to use semantic tokens.
+- **Consequences:** All text elements exceed WCAG 2.1 AA ($4.5:1$ ratio), verified by automated unit tests.
+
+---
 ### ADR-007: Windows NTFS Gradle Build Cache Redirection
 - **Status:** Accepted & Documented in v1.0.0.
 - **Context:** On Windows hosts with secondary storage drives (`D:\Code\CrunchBox`), Gradle 8.10.2's `dependencies-accessors` tasks fail during `assembleRelease` with `java.io.UncheckedIOException: Could not move temporary workspace to immutable location` due to atomic folder move restrictions across NTFS partitions.

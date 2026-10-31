@@ -51,3 +51,20 @@
 - **SHA-1 Fingerprint:** `D4:8F:E0:95:2A:E0:56:D7:95:83:B0:F9:1B:B9:F5:92:1B:B5:E0:FC`
 - **Stand-alone Verification:** Verified on device `LGN_LX2` (`AC9K2U6506000266`) without Metro bundler.
 
+
+---
+
+## 5. v1.1.0 Master Upgrade Verification Ledger
+
+### 5.1 Verification Checklist & Automated Quality Gates
+| Gate ID | Target Feature / Fix | Verification Criteria | Status | Evidence / Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **QA-110-01** | Top Safe-Area Jump | `lockedAndroidTopInset` maintains permanent high-water mark; opening `/settings` produces 0px shift | ✅ PASS | `evidence/v1.1.0/settings_top_inset_fixed.png` |
+| **QA-110-02** | Dark Mode Contrast | All text, chips, and sub-deck tabs in `tacticalDark` exceed 4.5:1 WCAG AA contrast ratio | ✅ PASS | `evidence/v1.1.0/dark_mode_contrast_all_modes.png` & `tests/utils/themeTokensContrast.test.ts` |
+| **QA-110-03** | Wide LCD & Auto-Compute | 100% bezel width, auto-scrolling expression line, 0ms live `ans ≈ ...` preview | ✅ PASS | `evidence/v1.1.0/wide_lcd_auto_compute.png` & `src/features/calculator/useLiveCalc.ts` |
+| **QA-110-04** | Casio fx-991EX Suite | $S \Leftrightarrow D$ continued fraction, `FACT` prime factorization, $n\text{C}r$/$n\text{P}r$ multiplicative loop, CONST bar | ✅ PASS | `evidence/v1.1.0/fx991ex_sd_and_fact.png` & `tests/features/classWizEngine.test.ts` |
+| **QA-110-05** | Fast History Manager | Tape search input, 7 mode filters, 4 action buttons (`+ Use Ans`, `✏ Edit`, `📋 Copy`, `★ Pin`) | ✅ PASS | `src/components/chassis/PaperTapeDrawer.tsx` |
+| **QA-110-06** | Interactive Guidebook | Bilingual EN/BN manual with "▶ Try It Now" executable buttons across all 6 categories | ✅ PASS | `evidence/v1.1.0/guidebook_modal_en_bn.png` & `src/features/guidebook/GuidebookModal.tsx` |
+| **QA-110-07** | In-App QA Analyzer | Real-time telemetry + 15-point automated self-test runner with formatted ASCII report export | ✅ PASS | `evidence/v1.1.0/qa_analyzer_15_pass.png` & `src/features/diagnostics/HardwareDiagnosticsModal.tsx` |
+| **QA-110-08** | In-Place Upgrade Install | `v1.1.0` (`versionCode: 2`) compiled with existing release keystore installs over `v1.0.0` with `adb install -r` | ✅ PASS | Signed standalone release APK verified on `LGN_LX2` |
+| **QA-110-09** | Full Test Suite | 154 unit tests passing (100% pass rate) across 12 test suites | ✅ PASS | 154/154 Jest tests green |

@@ -171,7 +171,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
           styles.subDeckBar,
           {
             backgroundColor: tokens.innerPanel,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible,
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
           },
@@ -194,7 +194,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                 styles.subDeckTab,
                 {
                   backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible,
                   borderWidth: 1.5,
                   borderRadius: hardwareConstants.borderRadiusSm,
                   borderBottomWidth: isActive ? 1.5 : 3,
@@ -202,12 +202,12 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                 },
               ]}
             >
-              <Icon size={12} color={tokens.inkBorder} strokeWidth={2.5} />
+              <Icon size={12} color={isActive ? tokens.keycapOperatorText : tokens.keycapNumberText} strokeWidth={2.5} />
               <Text
                 style={[
                   styles.subDeckLabel,
                   {
-                    color: tokens.inkBorder,
+                    color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
                     fontWeight: isActive ? '900' : '700',
                   },
                 ]}
@@ -241,7 +241,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                   styles.segmentBtn,
                   {
                     backgroundColor: isSelected ? tokens.actionGreen : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.5,
                     borderRadius: 4,
                   },
@@ -278,13 +278,13 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.regToggleBtn,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 1.5,
                 borderRadius: 4,
               },
             ]}
           >
-            <Text style={[styles.regToggleText, { color: tokens.inkBorder }]} maxFontSizeMultiplier={1.2}>
+            <Text style={[styles.regToggleText, { color: tokens.textPrimary }]} maxFontSizeMultiplier={1.2}>
               REG: <Text style={{ fontWeight: '900', color: '#D93829' }}>{devActiveRegister}</Text>
             </Text>
           </Pressable>
@@ -301,13 +301,13 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.regToggleBtn,
               {
                 backgroundColor: devIsSigned ? tokens.accentOps : tokens.keypadSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 1.5,
                 borderRadius: 4,
               },
             ]}
           >
-            <Text style={[styles.regToggleText, { color: tokens.inkBorder }]} maxFontSizeMultiplier={1.2}>
+            <Text style={[styles.regToggleText, { color: devIsSigned ? tokens.keycapOperatorText : tokens.keycapNumberText }]} maxFontSizeMultiplier={1.2}>
               {devIsSigned ? 'SIGNED (2s)' : 'UNSIGNED'}
             </Text>
           </Pressable>
@@ -323,7 +323,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.basesCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 2,
                 borderRadius: hardwareConstants.borderRadiusMd,
               },
@@ -410,10 +410,10 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               }}
               style={[
                 styles.bridgeBtn,
-                { backgroundColor: tokens.keypadSurface, borderColor: tokens.inkBorder },
+                { backgroundColor: tokens.keypadSurface, borderColor: tokens.borderVisible },
               ]}
             >
-              <Text style={styles.bridgeBtnText}>➔ SEND TO CALC</Text>
+              <Text style={[styles.bridgeBtnText, { color: tokens.keycapNumberText }]}>➔ SEND TO CALC</Text>
             </Pressable>
 
             <Pressable
@@ -426,10 +426,10 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               }}
               style={[
                 styles.bridgeBtn,
-                { backgroundColor: tokens.accentOps, borderColor: tokens.inkBorder },
+                { backgroundColor: tokens.accentOps, borderColor: tokens.borderVisible },
               ]}
             >
-              <Text style={[styles.bridgeBtnText, { color: tokens.inkBorder }]}>➔ SEND TO CURR</Text>
+              <Text style={[styles.bridgeBtnText, { color: tokens.keycapOperatorText }]}>➔ SEND TO CURR</Text>
             </Pressable>
           </View>
 
@@ -550,21 +550,21 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.aluRegistersCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 2,
                 borderRadius: hardwareConstants.borderRadiusMd,
               },
             ]}
           >
             <View style={styles.aluRegRow}>
-              <Text style={styles.aluRegName}>A ({devWordSize}b):</Text>
-              <Text style={styles.aluRegVal} numberOfLines={1}>
+              <Text style={[styles.aluRegName, { color: tokens.textSecondary }]}>A ({devWordSize}b):</Text>
+              <Text style={[styles.aluRegVal, { color: tokens.textPrimary }]} numberOfLines={1}>
                 {formatBigIntBase(parseToBigInt(devOperandA, 'DEC'), 'BIN', devWordSize)}
               </Text>
             </View>
             <View style={styles.aluRegRow}>
-              <Text style={styles.aluRegName}>B ({devWordSize}b):</Text>
-              <Text style={styles.aluRegVal} numberOfLines={1}>
+              <Text style={[styles.aluRegName, { color: tokens.textSecondary }]}>B ({devWordSize}b):</Text>
+              <Text style={[styles.aluRegVal, { color: tokens.textPrimary }]} numberOfLines={1}>
                 {formatBigIntBase(parseToBigInt(devOperandB, 'DEC'), 'BIN', devWordSize)}
               </Text>
             </View>
@@ -590,7 +590,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
 
                 return (
                   <View key={rowIdx} style={styles.bitRow}>
-                    <Text style={styles.bitRowLabel}>
+                    <Text style={[styles.bitRowLabel, { color: tokens.textSecondary }]}>
                       {highBit}..{lowBit}:
                     </Text>
 
@@ -614,11 +614,11 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                                 styles.bitCell,
                                 {
                                   backgroundColor: bit === 1 ? tokens.accentOps : tokens.keypadSurface,
-                                  borderColor: tokens.inkBorder,
+                                  borderColor: tokens.borderVisible,
                                 },
                               ]}
                             >
-                              <Text style={styles.bitCellText}>{bit}</Text>
+                              <Text style={[styles.bitCellText, { color: bit === 1 ? tokens.keycapOperatorText : tokens.keycapNumberText }]}>{bit}</Text>
                             </Pressable>
                           );
                         })}
@@ -643,11 +643,11 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                                 styles.bitCell,
                                 {
                                   backgroundColor: bit === 1 ? tokens.accentOps : tokens.keypadSurface,
-                                  borderColor: tokens.inkBorder,
+                                  borderColor: tokens.borderVisible,
                                 },
                               ]}
                             >
-                              <Text style={styles.bitCellText}>{bit}</Text>
+                              <Text style={[styles.bitCellText, { color: bit === 1 ? tokens.keycapOperatorText : tokens.keycapNumberText }]}>{bit}</Text>
                             </Pressable>
                           );
                         })}
@@ -694,7 +694,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                     styles.aluOpBtn,
                     {
                       backgroundColor: isSelected ? tokens.actionGreen : tokens.keypadSurface,
-                      borderColor: tokens.inkBorder,
+                      borderColor: tokens.borderVisible,
                       borderWidth: 1.8,
                     },
                   ]}
@@ -703,7 +703,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                     style={[
                       styles.aluOpBtnText,
                       {
-                        color: isSelected ? '#FFFDF7' : tokens.inkBorder,
+                        color: isSelected ? '#FFFDF7' : tokens.keycapNumberText,
                         fontWeight: isSelected ? '900' : '700',
                       },
                     ]}
@@ -725,13 +725,13 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.cardBox,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 2,
                 borderRadius: hardwareConstants.borderRadiusMd,
               },
             ]}
           >
-            <Text style={styles.cardHeaderTitle}>IEEE-754 SINGLE PRECISION (32-BIT)</Text>
+            <Text style={[styles.cardHeaderTitle, { color: tokens.textSecondary }]}>IEEE-754 SINGLE PRECISION (32-BIT)</Text>
 
             {/* Quick Test Chips */}
             <View style={styles.chipRow}>
@@ -746,11 +746,11 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                     styles.sampleChip,
                     {
                       backgroundColor: devFloatInput === sample ? tokens.accentOps : tokens.keypadSurface,
-                      borderColor: tokens.inkBorder,
+                      borderColor: tokens.borderVisible,
                     },
                   ]}
                 >
-                  <Text style={styles.sampleChipText}>{sample}</Text>
+                  <Text style={[styles.sampleChipText, { color: tokens.textPrimary }]}>{sample}</Text>
                 </Pressable>
               ))}
             </View>
@@ -801,13 +801,13 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.cardBox,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 2,
                 borderRadius: hardwareConstants.borderRadiusMd,
               },
             ]}
           >
-            <Text style={styles.cardHeaderTitle}>ASCII & UTF-8 MULTI-BYTE CODEC</Text>
+            <Text style={[styles.cardHeaderTitle, { color: tokens.textSecondary }]}>ASCII & UTF-8 MULTI-BYTE CODEC</Text>
 
             <View style={styles.chipRow}>
               {['Crunch', 'A', '100', 'বাংলা', 'CB-09'].map((sample) => (
@@ -821,11 +821,11 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
                     styles.sampleChip,
                     {
                       backgroundColor: devTextInput === sample ? tokens.accentOps : tokens.keypadSurface,
-                      borderColor: tokens.inkBorder,
+                      borderColor: tokens.borderVisible,
                     },
                   ]}
                 >
-                  <Text style={styles.sampleChipText}>{sample}</Text>
+                  <Text style={[styles.sampleChipText, { color: tokens.textPrimary }]}>{sample}</Text>
                 </Pressable>
               ))}
             </View>
@@ -860,26 +860,26 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
               styles.cardBox,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible,
                 borderWidth: 2,
                 borderRadius: hardwareConstants.borderRadiusMd,
               },
             ]}
           >
-            <Text style={styles.cardHeaderTitle}>DISCRETE MATH & SYSTEMS CHECKS</Text>
+            <Text style={[styles.cardHeaderTitle, { color: tokens.textSecondary }]}>DISCRETE MATH & SYSTEMS CHECKS</Text>
 
             <View style={styles.discreteItem}>
-              <Text style={styles.discreteLabel}>GCD(A, B):</Text>
-              <Text style={styles.discreteValue}>{discreteResults.gcdVal.toString(10)}</Text>
+              <Text style={[styles.discreteLabel, { color: tokens.textSecondary }]}>GCD(A, B):</Text>
+              <Text style={[styles.discreteValue, { color: tokens.textPrimary }]}>{discreteResults.gcdVal.toString(10)}</Text>
             </View>
 
             <View style={styles.discreteItem}>
-              <Text style={styles.discreteLabel}>LCM(A, B):</Text>
-              <Text style={styles.discreteValue}>{discreteResults.lcmVal.toString(10)}</Text>
+              <Text style={[styles.discreteLabel, { color: tokens.textSecondary }]}>LCM(A, B):</Text>
+              <Text style={[styles.discreteValue, { color: tokens.textPrimary }]}>{discreteResults.lcmVal.toString(10)}</Text>
             </View>
 
             <View style={styles.discreteItem}>
-              <Text style={styles.discreteLabel}>isPrime(A):</Text>
+              <Text style={[styles.discreteLabel, { color: tokens.textSecondary }]}>isPrime(A):</Text>
               <Text
                 style={[
                   styles.discreteValue,
@@ -893,7 +893,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
             </View>
 
             <View style={styles.discreteItem}>
-              <Text style={styles.discreteLabel}>isPowerOfTwo(A):</Text>
+              <Text style={[styles.discreteLabel, { color: tokens.textSecondary }]}>isPowerOfTwo(A):</Text>
               <Text
                 style={[
                   styles.discreteValue,
@@ -905,7 +905,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
             </View>
 
             <View style={styles.discreteItem}>
-              <Text style={styles.discreteLabel}>2^{devWordSize} (Address Space):</Text>
+              <Text style={[styles.discreteLabel, { color: tokens.textSecondary }]}>2^{devWordSize} (Address Space):</Text>
               <Text style={[styles.discreteValue, { fontSize: 11 }]}>
                 {powerOfTwoBigInt(devWordSize).toString(10)}
               </Text>
@@ -958,7 +958,7 @@ const DevKeycap: React.FC<DevKeycapProps> = ({
         styles.keycap,
         {
           backgroundColor: bg,
-          borderColor: tokens.inkBorder,
+          borderColor: tokens.borderVisible,
           opacity: enabled ? 1 : 0.3,
         },
       ]}

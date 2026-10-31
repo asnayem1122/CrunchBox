@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ export interface CurrencyCardProps {
   language?: 'en' | 'bn';
 }
 
-export const CurrencyCard: React.FC<CurrencyCardProps> = ({
+const CurrencyCardComponent: React.FC<CurrencyCardProps> = ({
   label,
   currencyCode,
   amount,
@@ -60,7 +60,7 @@ export const CurrencyCard: React.FC<CurrencyCardProps> = ({
         styles.cardContainer,
         {
           backgroundColor: tokens.innerPanel,
-          borderColor: tokens.inkBorder,
+          borderColor: tokens.borderVisible || tokens.inkBorder,
           borderWidth: hardwareConstants.borderWidth,
           borderRadius: hardwareConstants.borderRadiusMd,
           shadowColor: tokens.inkShadow,
@@ -89,7 +89,7 @@ export const CurrencyCard: React.FC<CurrencyCardProps> = ({
             styles.selectorBtn,
             {
               backgroundColor: tokens.keypadSurface,
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible || tokens.inkBorder,
               borderWidth: 2,
               borderRadius: hardwareConstants.borderRadiusSm,
               borderBottomWidth: 3.5,
@@ -97,10 +97,10 @@ export const CurrencyCard: React.FC<CurrencyCardProps> = ({
           ]}
         >
           <Text style={styles.flagIcon}>{info.flag}</Text>
-          <Text style={[styles.currencyCodeText, { color: tokens.inkBorder }]}>
+          <Text style={[styles.currencyCodeText, { color: tokens.textPrimary }]}>
             {info.code}
           </Text>
-          <ChevronDown size={14} color={tokens.inkBorder} strokeWidth={2.8} />
+          <ChevronDown size={14} color={tokens.textPrimary} strokeWidth={2.8} />
         </Pressable>
 
         {/* Amount Input or Readout */}
@@ -138,6 +138,17 @@ export const CurrencyCard: React.FC<CurrencyCardProps> = ({
     </View>
   );
 };
+
+export const CurrencyCard = memo(CurrencyCardComponent, (prev, next) => {
+  return (
+    prev.label === next.label &&
+    prev.currencyCode === next.currencyCode &&
+    prev.amount === next.amount &&
+    prev.isEditable === next.isEditable &&
+    prev.themeMode === next.themeMode &&
+    prev.language === next.language
+  );
+});
 
 const styles = StyleSheet.create({
   cardContainer: {

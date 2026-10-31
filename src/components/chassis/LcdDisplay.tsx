@@ -27,6 +27,11 @@ export interface AluFlagsState {
 export interface LcdDisplayProps {
   expression: string;
   value: string;
+  liveAnswer?: string | null;
+  fractionMode?: 'DEC' | 'FRAC' | 'MIXED';
+  fractionDisplay?: string | null;
+  primeFactorsDisplay?: string | null;
+  onCycleFractionMode?: () => void;
   mode?: string;
   angleMode?: 'deg' | 'rad';
   onToggleAngleMode?: () => void;
@@ -58,6 +63,11 @@ export function getDynamicLcdFontSize(charCount: number): number {
 export const LcdDisplay: React.FC<LcdDisplayProps> = ({
   expression,
   value,
+  liveAnswer,
+  fractionMode = 'DEC',
+  fractionDisplay,
+  primeFactorsDisplay,
+  onCycleFractionMode,
   mode = 'CALC',
   angleMode = 'deg',
   onToggleAngleMode,
@@ -81,7 +91,8 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
   const lcdColors = getLcdColors(tokens, backlightMode);
 
   const displayValue = error ? error : value || '0';
-  const fontSize = getDynamicLcdFontSize(displayValue.length);
+  const effectiveReadout = primeFactorsDisplay || fractionDisplay || displayValue;
+  const fontSize = getDynamicLcdFontSize(effectiveReadout.length);
 
   const handleAngleToggle = () => {
     triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
@@ -96,6 +107,11 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
   const handleBacklightToggle = () => {
     triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
     onToggleBacklight?.();
+  };
+
+  const handleFractionToggle = () => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
+    onCycleFractionMode?.();
   };
 
   const backlightLabel =
@@ -119,7 +135,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
           styles.screenSurface,
           {
             backgroundColor: lcdColors.surface,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible,
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
           },
@@ -127,7 +143,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
       >
         {/* Top Annunciator Strip */}
         <View style={styles.topStatusStrip}>
-          {/* Left: Mode Badge & Memory Indicator */}
+          {/* Left: Mode Badge & Indicators */}
           <View style={styles.statusLeft}>
             <View
               style={[
@@ -144,14 +160,47 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               <View
                 style={[
                   styles.memoryBadge,
-                  { backgroundColor: tokens.accentOps, borderColor: tokens.inkBorder },
+                  { backgroundColor: tokens.accentOps, borderColor: tokens.borderVisible },
                 ]}
               >
                 <Text style={styles.memoryBadgeText}>M</Text>
               </View>
             ) : null}
 
-            {/* Backlight Preset Annunciator Button */}
+            {/* S<=>D Fraction Pill for CALC and SCI modes */}
+            {onCycleFractionMode && (mode === 'CALC' || mode === 'SCI') ? (
+              <Pressable
+                accessible={true}
+                accessibilityLabel={`Fraction format: ${fractionMode}`}
+                testID="lcd-sd-toggle"
+                onPress={handleFractionToggle}
+                style={[
+                  styles.microBadge,
+                  {
+                    backgroundColor:
+                      fractionMode !== 'DEC' ? tokens.accentOps : tokens.innerPanel,
+                    borderColor: tokens.borderVisible,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.microBadgeText,
+                    {
+                      color:
+                        fractionMode !== 'DEC'
+                          ? tokens.keycapOperatorText
+                          : tokens.textPrimary,
+                      fontWeight: '900',
+                    },
+                  ]}
+                >
+                  S⇔D{fractionMode !== 'DEC' ? `:${fractionMode}` : ''}
+                </Text>
+              </Pressable>
+            ) : null}
+
+            {/* Backlight Preset Button */}
             {onToggleBacklight ? (
               <Pressable
                 accessible={true}
@@ -162,11 +211,11 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
                   styles.microBadge,
                   {
                     backgroundColor: tokens.innerPanel,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                   },
                 ]}
               >
-                <Text style={[styles.microBadgeText, { color: tokens.inkBorder }]}>
+                <Text style={[styles.microBadgeText, { color: tokens.textPrimary }]}>
                   ☼ {backlightLabel}
                 </Text>
               </Pressable>
@@ -183,17 +232,17 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
                   styles.microBadge,
                   {
                     backgroundColor: tokens.innerPanel,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                   },
                 ]}
               >
-                <Text style={[styles.microBadgeText, { color: tokens.inkBorder }]}>
+                <Text style={[styles.microBadgeText, { color: tokens.textPrimary }]}>
                   {digitGroupingMode}
                 </Text>
               </Pressable>
             ) : null}
 
-            {/* Rate Freshness Annunciator */}
+            {/* Rate Freshness */}
             {rateFreshness ? (
               <View
                 style={[
@@ -227,25 +276,32 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
                   styles.angleToggleBtn,
                   {
                     backgroundColor: tokens.innerPanel,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                   },
                 ]}
               >
-                <Text style={[styles.angleToggleText, { color: tokens.inkBorder }]}>
+                <Text style={[styles.angleToggleText, { color: tokens.textPrimary }]}>
                   {angleMode.toUpperCase()}
                 </Text>
               </Pressable>
             ) : null}
 
-            <Text
-              style={[
-                styles.expressionText,
-                { color: lcdColors.text },
-              ]}
-              numberOfLines={1}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.expressionScroll}
+              style={styles.expressionScrollView}
             >
-              {expression || ' '}
-            </Text>
+              <Text
+                style={[
+                  styles.expressionText,
+                  { color: lcdColors.text },
+                ]}
+                numberOfLines={1}
+              >
+                {expression ? `${expression}_` : ' '}
+              </Text>
+            </ScrollView>
           </View>
         </View>
 
@@ -267,10 +323,19 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               numberOfLines={1}
               maxFontSizeMultiplier={1.2}
             >
-              {displayValue}
+              {effectiveReadout}
             </Text>
           </ScrollView>
         </View>
+
+        {/* 0ms Speculative Live Auto-Compute Line */}
+        {liveAnswer && !error ? (
+          <View style={styles.liveAnswerRow}>
+            <Text style={[styles.liveAnswerText, { color: lcdColors.text }]}>
+              ans ≈ {liveAnswer}
+            </Text>
+          </View>
+        ) : null}
 
         {/* ALU Flags Bar (If DEV Mode) OR Programmer Base Strip */}
         {aluFlags ? (
@@ -278,7 +343,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
             style={[
               styles.aluFlagsBar,
               {
-                borderTopColor: tokens.inkBorder,
+                borderTopColor: tokens.borderVisible,
                 borderTopWidth: 1,
               },
             ]}
@@ -313,7 +378,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
             style={[
               styles.baseBar,
               {
-                borderTopColor: tokens.inkBorder,
+                borderTopColor: tokens.borderVisible,
                 borderTopWidth: 1,
               },
             ]}
@@ -372,6 +437,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flexShrink: 1,
   },
   modeTag: {
     paddingHorizontal: 5,
@@ -424,6 +490,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     flexShrink: 1,
+    maxWidth: '55%',
+    justifyContent: 'flex-end',
   },
   angleToggleBtn: {
     paddingHorizontal: 5,
@@ -437,12 +505,17 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.5,
   },
+  expressionScrollView: {
+    maxWidth: 130,
+  },
+  expressionScroll: {
+    alignItems: 'center',
+  },
   expressionText: {
     fontSize: 10,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
     opacity: 0.85,
-    maxWidth: 120,
   },
   mainReadoutWrapper: {
     height: 48,
@@ -460,6 +533,17 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.8,
     textAlign: 'right',
+  },
+  liveAnswerRow: {
+    alignItems: 'flex-end',
+    paddingVertical: 1,
+  },
+  liveAnswerText: {
+    fontSize: 11,
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    opacity: 0.75,
+    letterSpacing: 0.5,
   },
   baseBar: {
     flexDirection: 'row',

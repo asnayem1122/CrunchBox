@@ -11,6 +11,32 @@ export interface HexBinOct {
   oct: string;
 }
 
+export interface FractionResult {
+  numerator: number;
+  denominator: number;
+  whole: number;
+  remainder: number;
+  displayFrac: string;
+  displayMixed: string;
+  isExact: boolean;
+}
+
+export interface ScientificConstant {
+  symbol: string;
+  name: string;
+  value: number;
+  unit: string;
+}
+
+export const SCIENTIFIC_CONSTANTS: Record<string, ScientificConstant> = {
+  c: { symbol: 'c', name: 'Speed of Light', value: 299792458, unit: 'm/s' },
+  g: { symbol: 'g', name: 'Std Gravity', value: 9.80665, unit: 'm/s²' },
+  h: { symbol: 'h', name: 'Planck Const', value: 6.62607015e-34, unit: 'J·s' },
+  na: { symbol: 'NA', name: 'Avogadro', value: 6.02214076e23, unit: 'mol⁻¹' },
+  pi: { symbol: 'π', name: 'Pi', value: Math.PI, unit: '' },
+  e: { symbol: 'e', name: 'Euler', value: Math.E, unit: '' },
+};
+
 interface Token {
   type: 'number' | 'constant' | 'function' | 'operator' | 'unary' | 'postfix';
   value: string;
@@ -22,6 +48,8 @@ interface Token {
  * 2. Unary negation (u-) vs binary subtraction (-)
  * 3. Implicit multiplication (2π -> 2 * π, 5(2+3) -> 5 * (2+3), (2)(3) -> (2)*(3))
  * 4. Postfix percentage (%) and factorial (!)
+ * 5. Infix combinatorics (nCr -> C, nPr -> P)
+ * 6. Scientific constants (c, g, h, na, pi, e)
  */
 export function tokenizeExpression(expr: string): Token[] {
   const normalized = expr
@@ -58,7 +86,28 @@ export function tokenizeExpression(expr: string): Token[] {
         ident += normalized[i].toLowerCase();
         i++;
       }
-      if (ident === 'pi' || ident === 'e') {
+
+      if (ident === 'ncr') {
+        rawTokens.push({ type: 'operator', value: 'C' });
+      } else if (ident === 'npr') {
+        rawTokens.push({ type: 'operator', value: 'P' });
+      } else if (ident === 'c' || ident === 'p') {
+        const prev = rawTokens.length > 0 ? rawTokens[rawTokens.length - 1] : null;
+        const prevCanBeOperand =
+          prev &&
+          (prev.type === 'number' ||
+            prev.type === 'constant' ||
+            prev.type === 'postfix' ||
+            (prev.type === 'operator' && prev.value === ')'));
+
+        if (prevCanBeOperand) {
+          rawTokens.push({ type: 'operator', value: ident.toUpperCase() });
+        } else if (ident === 'c') {
+          rawTokens.push({ type: 'constant', value: 'c' });
+        } else {
+          rawTokens.push({ type: 'function', value: ident });
+        }
+      } else if (ident in SCIENTIFIC_CONSTANTS) {
         rawTokens.push({ type: 'constant', value: ident });
       } else {
         rawTokens.push({ type: 'function', value: ident });
@@ -149,6 +198,8 @@ function toRPN(tokens: Token[]): Token[] {
     '-': 2,
     '*': 3,
     '/': 3,
+    'C': 4,
+    'P': 4,
     '^': 5,
     'u-': 6,
     'u+': 6,
@@ -163,7 +214,6 @@ function toRPN(tokens: Token[]): Token[] {
     } else if (token.type === 'function') {
       opStack.push(token);
     } else if (token.type === 'postfix') {
-      // Postfix operators (! and %) bind immediately to the current value
       output.push(token);
     } else if (token.type === 'unary') {
       opStack.push(token);
@@ -191,9 +241,8 @@ function toRPN(tokens: Token[]): Token[] {
         output.push(opStack.pop()!);
       }
       if (opStack.length > 0 && opStack[opStack.length - 1].value === '(') {
-        opStack.pop(); // remove '('
+        opStack.pop();
       }
-      // If top of stack is a function, pop it to output
       if (opStack.length > 0 && opStack[opStack.length - 1].type === 'function') {
         output.push(opStack.pop()!);
       }
@@ -226,6 +275,176 @@ export function computeFactorial(n: number): number | null {
 }
 
 /**
+ * Multiplicative loop formula for combinations nCr (prevents factorial overflow for n > 170).
+ */
+export function computeCombinations(n: number, r: number): number | null {
+  if (
+    !Number.isInteger(n) ||
+    !Number.isInteger(r) ||
+    r < 0 ||
+    r > n ||
+    n < 0
+  ) {
+    return null;
+  }
+  if (r === 0 || r === n) return 1;
+  if (r > n / 2) r = n - r;
+
+  let res = 1;
+  for (let i = 1; i <= r; i++) {
+    res = (res * (n - i + 1)) / i;
+    if (!Number.isFinite(res)) return null;
+  }
+  return Math.round(res);
+}
+
+/**
+ * Multiplicative loop formula for permutations nPr.
+ */
+export function computePermutations(n: number, r: number): number | null {
+  if (
+    !Number.isInteger(n) ||
+    !Number.isInteger(r) ||
+    r < 0 ||
+    r > n ||
+    n < 0
+  ) {
+    return null;
+  }
+  if (r === 0) return 1;
+
+  let res = 1;
+  for (let i = 0; i < r; i++) {
+    res *= (n - i);
+    if (!Number.isFinite(res)) return null;
+  }
+  return Math.round(res);
+}
+
+/**
+ * Continued fractions expansion algorithm to convert decimal to rational fraction.
+ * Capped by maxDenominator <= 100000.
+ */
+export function decimalToFraction(val: number, maxDenominator = 100000): FractionResult | null {
+  if (Number.isNaN(val) || !Number.isFinite(val)) return null;
+  const sign = val < 0 ? -1 : 1;
+  const absVal = Math.abs(val);
+
+  if (Math.abs(absVal - Math.round(absVal)) < 1e-10) {
+    const intVal = Math.round(absVal);
+    return {
+      numerator: sign * intVal,
+      denominator: 1,
+      whole: sign * intVal,
+      remainder: 0,
+      displayFrac: `${sign * intVal}`,
+      displayMixed: `${sign * intVal}`,
+      isExact: true,
+    };
+  }
+
+  let h1 = 1, h2 = 0;
+  let k1 = 0, k2 = 1;
+  let b = absVal;
+
+  do {
+    const a = Math.floor(b);
+    let aux = h1;
+    h1 = a * h1 + h2;
+    h2 = aux;
+    aux = k1;
+    k1 = a * k1 + k2;
+    k2 = aux;
+    if (k1 > maxDenominator) break;
+    b = 1 / (b - a);
+  } while (Math.abs(absVal - h1 / k1) > absVal * 1e-9 && Number.isFinite(b));
+
+  if (k1 > maxDenominator || k1 === 0) {
+    return null;
+  }
+
+  const num = sign * h1;
+  const den = k1;
+  const whole = Math.trunc(num / den);
+  const remainder = Math.abs(num % den);
+
+  const displayFrac = `${num}/${den}`;
+  const displayMixed =
+    whole !== 0 && remainder !== 0 ? `${whole} ${remainder}/${den}` : displayFrac;
+
+  return {
+    numerator: num,
+    denominator: den,
+    whole,
+    remainder,
+    displayFrac,
+    displayMixed,
+    isExact: Math.abs(val - num / den) < 1e-7,
+  };
+}
+
+/**
+ * Prime factorization suite (FACT key in fx-991EX).
+ * Guards non-integers, values <= 1, and values > 10^12.
+ */
+export function primeFactorize(val: number): string | null {
+  if (
+    Number.isNaN(val) ||
+    !Number.isFinite(val) ||
+    !Number.isInteger(val) ||
+    val <= 1 ||
+    val > 1000000000000
+  ) {
+    return null;
+  }
+
+  let n = val;
+  const factors: Map<number, number> = new Map();
+
+  // Factor out 2
+  while (n % 2 === 0) {
+    factors.set(2, (factors.get(2) || 0) + 1);
+    n = n / 2;
+  }
+
+  // Factor out 3
+  while (n % 3 === 0) {
+    factors.set(3, (factors.get(3) || 0) + 1);
+    n = n / 3;
+  }
+
+  // Wheel factorization (6k +/- 1)
+  let d = 5;
+  while (d * d <= n) {
+    while (n % d === 0) {
+      factors.set(d, (factors.get(d) || 0) + 1);
+      n = n / d;
+    }
+    const nextD = d + 2;
+    while (n % nextD === 0) {
+      factors.set(nextD, (factors.get(nextD) || 0) + 1);
+      n = n / nextD;
+    }
+    d += 6;
+  }
+
+  if (n > 1) {
+    factors.set(n, (factors.get(n) || 0) + 1);
+  }
+
+  const parts: string[] = [];
+  for (const [base, exp] of factors.entries()) {
+    if (exp === 1) {
+      parts.push(`${base}`);
+    } else {
+      parts.push(`${base}^${exp}`);
+    }
+  }
+
+  return parts.join(' × ');
+}
+
+/**
  * Evaluates RPN tokens according to strict scientific and precision rules.
  */
 function evaluateRPN(rpn: Token[], angleMode: AngleMode): EvalResult {
@@ -235,7 +454,9 @@ function evaluateRPN(rpn: Token[], angleMode: AngleMode): EvalResult {
     if (token.type === 'number') {
       stack.push(parseFloat(token.value));
     } else if (token.type === 'constant') {
-      if (token.value === 'pi') stack.push(Math.PI);
+      const c = SCIENTIFIC_CONSTANTS[token.value];
+      if (c) stack.push(c.value);
+      else if (token.value === 'pi') stack.push(Math.PI);
       else if (token.value === 'e') stack.push(Math.E);
     } else if (token.type === 'unary') {
       if (stack.length < 1) return { result: NaN, error: 'ERROR' };
@@ -273,6 +494,18 @@ function evaluateRPN(rpn: Token[], angleMode: AngleMode): EvalResult {
         case '^':
           res = Math.pow(a, b);
           break;
+        case 'C': {
+          const cRes = computeCombinations(a, b);
+          if (cRes === null) return { result: NaN, error: 'ERROR' };
+          res = cRes;
+          break;
+        }
+        case 'P': {
+          const pRes = computePermutations(a, b);
+          if (pRes === null) return { result: NaN, error: 'ERROR' };
+          res = pRes;
+          break;
+        }
         default:
           return { result: NaN, error: 'ERROR' };
       }
@@ -435,7 +668,6 @@ export function formatCalcNumber(val: number): string {
   if (Number.isNaN(val) || !Number.isFinite(val)) {
     return 'ERROR';
   }
-  // If integer or within safe range, use standard formatting
   if (Math.abs(val) > 1e15 || (Math.abs(val) < 1e-7 && val !== 0)) {
     return val.toExponential(6).replace(/\.?0+e/, 'e');
   }

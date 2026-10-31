@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -15,8 +16,9 @@ export default function RootLayout() {
     <HardwareErrorBoundary>
       <SafeAreaProvider>
         <StatusBar
+          translucent={false}
           style={themeMode === 'tactical' ? 'light' : 'dark'}
-          backgroundColor={tokens.appBackground}
+          backgroundColor={tokens.chassisSurface}
         />
         <Stack
           screenOptions={{
@@ -29,7 +31,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="currency-picker"
             options={{
-              presentation: 'modal',
+              presentation: Platform.OS === 'android' ? 'card' : 'modal',
               headerShown: false,
               animation: 'slide_from_bottom',
             }}
@@ -37,7 +39,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="settings"
             options={{
-              presentation: 'modal',
+              presentation: Platform.OS === 'android' ? 'card' : 'modal',
               headerShown: false,
               animation: 'slide_from_bottom',
             }}

@@ -106,7 +106,8 @@
     "tear_button": "TEAR TAPE",
     "tap_hint": "Tap any receipt line to recall value into active calculator",
     "empty": "No calculation receipts recorded yet.",
-    "verified_stamp": "VERIFIED BY CRUNCHBOX // FIELD UNIT CB-09"
+    "verified_stamp": "VERIFIED BY CRUNCHBOX // FIELD UNIT CB-09",
+    "tab": "TAPE"
   },
   "settings": {
     "title": "HARDWARE SETTINGS",

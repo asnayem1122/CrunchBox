@@ -20,6 +20,15 @@ export interface ColorTokens {
   ledActive: string;
   ledInactive: string;
   rivetFill: string;
+  // v1.1.0 Semantic Contrast Tokens
+  keycapNumberText: string;
+  keycapSecondaryText: string;
+  keycapOperatorText: string;
+  keycapActionText: string;
+  keycapDangerText: string;
+  inputBackground: string;
+  inputText: string;
+  borderVisible: string;
 }
 
 export const fieldLightTokens: ColorTokens = {
@@ -41,6 +50,14 @@ export const fieldLightTokens: ColorTokens = {
   ledActive: '#22C55E',         // Glowing Green
   ledInactive: '#4B5563',
   rivetFill: '#F5F0E1',
+  keycapNumberText: '#1B241E',
+  keycapSecondaryText: '#1B241E',
+  keycapOperatorText: '#1B241E',
+  keycapActionText: '#FFFDF7',
+  keycapDangerText: '#FFFDF7',
+  inputBackground: '#FFFDF7',
+  inputText: '#1B241E',
+  borderVisible: '#1B241E',
 };
 
 export const tacticalDarkTokens: ColorTokens = {
@@ -55,13 +72,21 @@ export const tacticalDarkTokens: ColorTokens = {
   recessedLcdText: '#4ADE80',   // Illuminated Night Phosphor Green
   inkBorder: '#070A08',         // Pitch Ink
   inkShadow: '#070A08',         // Pitch Ink
-  textPrimary: '#F5F0E1',
-  textSecondary: '#A3B899',
-  textMuted: '#5F7366',
+  textPrimary: '#F5F6FA',       // Crisp High-Contrast Off-White
+  textSecondary: '#B8C0CC',     // Bright Cool Gray
+  textMuted: '#8892A0',         // Readable Secondary Muted
   cardShadow: '#070A08',
   ledActive: '#4ADE80',         // Night Vision Green
   ledInactive: '#1E2B22',
   rivetFill: '#3A4A3E',
+  keycapNumberText: '#F5F6FA',
+  keycapSecondaryText: '#E5E7EB',
+  keycapOperatorText: '#0D120F', // Dark on Gold/Amber keycap
+  keycapActionText: '#F5F6FA',   // Crisp White on Green keycap
+  keycapDangerText: '#FFFDF7',   // Crisp White on Red keycap
+  inputBackground: '#121A15',
+  inputText: '#F5F6FA',
+  borderVisible: '#3A4D40',     // Subtle visible border so cards/buttons don't get lost
 };
 
 export const themeTokens = {
@@ -103,6 +128,7 @@ export function getLcdColors(tokens: ColorTokens, backlightMode: LcdBacklightMod
       border: tokens.inkBorder,
     };
   }
+  // Default 'sage'
   return {
     surface: tokens.recessedLcd,
     text: tokens.recessedLcdText,

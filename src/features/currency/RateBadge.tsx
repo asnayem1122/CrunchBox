@@ -36,12 +36,12 @@ export const RateBadge: React.FC<RateBadgeProps> = ({
             styles.staleBadge,
             {
               backgroundColor: tokens.accentOps,
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible || tokens.inkBorder,
               borderWidth: hardwareConstants.borderWidth,
             },
           ]}
         >
-          <Text style={[styles.staleText, { color: tokens.inkBorder }]}>
+          <Text style={[styles.staleText, { color: tokens.keycapOperatorText }]}>
             {t('currency.stale_badge', 'OFFLINE CACHE')}
           </Text>
         </View>

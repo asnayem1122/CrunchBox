@@ -79,7 +79,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
           styles.tabButton,
           {
             backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible || tokens.inkBorder,
             borderWidth: 2,
             borderRadius: hardwareConstants.borderRadiusSm,
             borderBottomWidth: isActive ? 2 : 4,
@@ -94,7 +94,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
               styles.ledPip,
               {
                 backgroundColor: isActive ? tokens.ledActive : tokens.ledInactive,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible || tokens.inkBorder,
               },
             ]}
           />
@@ -102,7 +102,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
             style={[
               styles.tabLabel,
               {
-                color: tokens.inkBorder,
+                color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
                 fontWeight: isActive ? '900' : '700',
               },
             ]}
@@ -122,7 +122,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
         styles.deckContainer,
         {
           backgroundColor: tokens.innerPanel,
-          borderColor: tokens.inkBorder,
+          borderColor: tokens.borderVisible || tokens.inkBorder,
           borderWidth: hardwareConstants.borderWidth,
           borderRadius: hardwareConstants.borderRadiusMd,
         },

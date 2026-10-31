@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  View,
   Text,
   Pressable,
   ScrollView,
@@ -56,7 +55,7 @@ export const PopularChips: React.FC<PopularChipsProps> = ({
               styles.chip,
               {
                 backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: tokens.borderVisible || tokens.inkBorder,
                 borderWidth: 1.8,
                 borderRadius: hardwareConstants.borderRadiusSm,
                 borderBottomWidth: isActive ? 1.8 : 3.2,
@@ -69,7 +68,7 @@ export const PopularChips: React.FC<PopularChipsProps> = ({
               style={[
                 styles.codeText,
                 {
-                  color: tokens.inkBorder,
+                  color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
                   fontWeight: isActive ? '900' : '700',
                 },
               ]}
@@ -98,10 +97,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   flagText: {
-    fontSize: 12,
+    fontSize: 14,
   },
   codeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
   },

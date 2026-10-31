@@ -82,6 +82,8 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
     setActiveTab(tab);
   };
 
+  const border = tokens.borderVisible || tokens.inkBorder;
+
   return (
     <View style={styles.container}>
       {/* Sub-Tab Navigation Bar */}
@@ -90,7 +92,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
           styles.tabsRow,
           {
             backgroundColor: tokens.innerPanel,
-            borderColor: tokens.inkBorder,
+            borderColor: border,
             borderWidth: 1.8,
             borderRadius: hardwareConstants.borderRadiusSm,
           },
@@ -102,7 +104,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
             styles.tabItem,
             activeTab === 'tip' && {
               backgroundColor: tokens.accentOps,
-              borderColor: tokens.inkBorder,
+              borderColor: border,
               borderWidth: 1.5,
               borderRadius: 4,
             },
@@ -111,7 +113,10 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
           <Text
             style={[
               styles.tabText,
-              { color: tokens.inkBorder, fontWeight: activeTab === 'tip' ? '900' : '700' },
+              {
+                color: activeTab === 'tip' ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                fontWeight: activeTab === 'tip' ? '900' : '700',
+              },
             ]}
           >
             {t('tools.tabs.tip', 'TIP & SPLIT')}
@@ -124,7 +129,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
             styles.tabItem,
             activeTab === 'discount' && {
               backgroundColor: tokens.accentOps,
-              borderColor: tokens.inkBorder,
+              borderColor: border,
               borderWidth: 1.5,
               borderRadius: 4,
             },
@@ -133,7 +138,10 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
           <Text
             style={[
               styles.tabText,
-              { color: tokens.inkBorder, fontWeight: activeTab === 'discount' ? '900' : '700' },
+              {
+                color: activeTab === 'discount' ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                fontWeight: activeTab === 'discount' ? '900' : '700',
+              },
             ]}
           >
             {t('tools.tabs.discount', 'DISCOUNT & TAX')}
@@ -146,7 +154,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
             styles.tabItem,
             activeTab === 'loan' && {
               backgroundColor: tokens.accentOps,
-              borderColor: tokens.inkBorder,
+              borderColor: border,
               borderWidth: 1.5,
               borderRadius: 4,
             },
@@ -155,7 +163,10 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
           <Text
             style={[
               styles.tabText,
-              { color: tokens.inkBorder, fontWeight: activeTab === 'loan' ? '900' : '700' },
+              {
+                color: activeTab === 'loan' ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                fontWeight: activeTab === 'loan' ? '900' : '700',
+              },
             ]}
           >
             {t('tools.tabs.loan', 'LOAN EMI')}
@@ -168,7 +179,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
             styles.tabItem,
             activeTab === 'bmi' && {
               backgroundColor: tokens.accentOps,
-              borderColor: tokens.inkBorder,
+              borderColor: border,
               borderWidth: 1.5,
               borderRadius: 4,
             },
@@ -177,7 +188,10 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
           <Text
             style={[
               styles.tabText,
-              { color: tokens.inkBorder, fontWeight: activeTab === 'bmi' ? '900' : '700' },
+              {
+                color: activeTab === 'bmi' ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                fontWeight: activeTab === 'bmi' ? '900' : '700',
+              },
             ]}
           >
             {t('tools.tabs.bmi', 'BMI GAUGE')}
@@ -193,7 +207,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.inputCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -220,13 +234,20 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
                     styles.presetBtn,
                     {
                       backgroundColor: tipPercent === p ? tokens.accentOps : tokens.keypadSurface,
-                      borderColor: tokens.inkBorder,
+                      borderColor: border,
                       borderWidth: 1.5,
                       borderRadius: 4,
                     },
                   ]}
                 >
-                  <Text style={[styles.presetText, { color: tokens.inkBorder }]}>{p}%</Text>
+                  <Text
+                    style={[
+                      styles.presetText,
+                      { color: tipPercent === p ? tokens.keycapOperatorText : tokens.keycapNumberText },
+                    ]}
+                  >
+                    {p}%
+                  </Text>
                 </Pressable>
               ))}
             </View>
@@ -237,16 +258,16 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
             <View style={styles.stepperRow}>
               <Pressable
                 onPress={() => setTipGuests((g) => Math.max(1, g - 1))}
-                style={[styles.stepperBtn, { backgroundColor: tokens.keypadSurface, borderColor: tokens.inkBorder }]}
+                style={[styles.stepperBtn, { backgroundColor: tokens.keypadSurface, borderColor: border }]}
               >
-                <Text style={styles.stepperBtnText}>−</Text>
+                <Text style={[styles.stepperBtnText, { color: tokens.keycapNumberText }]}>−</Text>
               </Pressable>
               <Text style={[styles.stepperValueText, { color: tokens.textPrimary }]}>{tipGuests}</Text>
               <Pressable
                 onPress={() => setTipGuests((g) => g + 1)}
-                style={[styles.stepperBtn, { backgroundColor: tokens.keypadSurface, borderColor: tokens.inkBorder }]}
+                style={[styles.stepperBtn, { backgroundColor: tokens.keypadSurface, borderColor: border }]}
               >
-                <Text style={styles.stepperBtnText}>+</Text>
+                <Text style={[styles.stepperBtnText, { color: tokens.keycapNumberText }]}>+</Text>
               </Pressable>
             </View>
           </View>
@@ -257,7 +278,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.summaryCard,
               {
                 backgroundColor: tokens.chassisSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -286,7 +307,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.inputCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -313,13 +334,20 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
                     styles.presetBtn,
                     {
                       backgroundColor: discPercent === p ? tokens.accentOps : tokens.keypadSurface,
-                      borderColor: tokens.inkBorder,
+                      borderColor: border,
                       borderWidth: 1.5,
                       borderRadius: 4,
                     },
                   ]}
                 >
-                  <Text style={[styles.presetText, { color: tokens.inkBorder }]}>{p}%</Text>
+                  <Text
+                    style={[
+                      styles.presetText,
+                      { color: discPercent === p ? tokens.keycapOperatorText : tokens.keycapNumberText },
+                    ]}
+                  >
+                    {p}%
+                  </Text>
                 </Pressable>
               ))}
             </View>
@@ -341,7 +369,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.summaryCard,
               {
                 backgroundColor: tokens.chassisSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -370,7 +398,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.inputCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -417,7 +445,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.summaryCard,
               {
                 backgroundColor: tokens.chassisSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -446,7 +474,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.inputCard,
               {
                 backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -483,7 +511,7 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
               styles.summaryCard,
               {
                 backgroundColor: tokens.chassisSurface,
-                borderColor: tokens.inkBorder,
+                borderColor: border,
                 borderWidth: hardwareConstants.borderWidth,
               },
             ]}
@@ -500,12 +528,15 @@ export const SmartToolsView: React.FC<SmartToolsViewProps> = ({
                   {
                     color:
                       bmiResult.category === 'normal'
-                        ? '#4ADE80'
-                        : tokens.accentOps,
+                        ? '#22C55E'
+                        : bmiResult.category === 'underweight'
+                        ? '#3B82F6'
+                        : '#EF4444',
+                    fontWeight: '900',
                   },
                 ]}
               >
-                {bmiResult.categoryLabelEn}
+                {bmiResult.category}
               </Text>
             </View>
           </View>
@@ -524,63 +555,66 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 3,
     gap: 3,
+    marginBottom: 6,
   },
   tabItem: {
     flex: 1,
-    paddingVertical: 6,
+    paddingVertical: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabText: {
-    fontSize: 9,
+    fontSize: 9.5,
     fontFamily: 'monospace',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   deckContent: {
-    marginTop: 6,
-    gap: 6,
+    width: '100%',
   },
   inputCard: {
     padding: 12,
     borderRadius: 8,
+    marginBottom: 8,
   },
   fieldLabel: {
     fontSize: 9.5,
+    fontWeight: '900',
     fontFamily: 'monospace',
-    fontWeight: '800',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     marginBottom: 4,
   },
   fieldInput: {
-    fontSize: 22,
-    fontWeight: '900',
-    fontFamily: 'monospace',
-    paddingVertical: 2,
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#1B241E',
-  },
-  fieldInputSmall: {
     fontSize: 18,
     fontWeight: '900',
     fontFamily: 'monospace',
+    paddingVertical: 4,
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#8FA893',
+  },
+  fieldInputSmall: {
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: 'monospace',
     paddingVertical: 2,
     borderBottomWidth: 1.5,
-    borderBottomColor: '#1B241E',
+    borderBottomColor: '#8FA893',
   },
   presetsRow: {
     flexDirection: 'row',
     gap: 6,
     marginTop: 4,
+    marginBottom: 6,
   },
   presetBtn: {
     flex: 1,
-    paddingVertical: 6,
+    paddingVertical: 5,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   presetText: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
     fontFamily: 'monospace',
+    fontWeight: '800',
   },
   stepperRow: {
     flexDirection: 'row',
@@ -589,16 +623,16 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   stepperBtn: {
-    width: 38,
-    height: 38,
-    borderWidth: 2,
+    width: 36,
+    height: 36,
+    borderWidth: 1.5,
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepperBtnText: {
-    fontSize: 20,
-    fontWeight: '900',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   stepperValueText: {
     fontSize: 18,
@@ -612,7 +646,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     padding: 12,
     borderRadius: 8,
-    gap: 4,
+    gap: 6,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -620,21 +654,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabelLight: {
-    color: '#F5F0E1',
-    fontSize: 11,
+    fontSize: 10.5,
     fontFamily: 'monospace',
     fontWeight: '700',
+    color: '#D5DBD2',
   },
   summaryValueBig: {
-    color: '#FFFDF7',
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: 'monospace',
     fontWeight: '900',
+    color: '#E5A823',
   },
   summaryValueLight: {
-    color: '#FFFDF7',
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'monospace',
     fontWeight: '800',
+    color: '#F5F0E1',
   },
 });

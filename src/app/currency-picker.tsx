@@ -36,6 +36,8 @@ export default function CurrencyPickerModal() {
     setCurrencies,
     themeMode,
     language,
+    soundEnabled,
+    hapticsEnabled,
   } = useAppStore();
 
   const tokens = getThemeTokens(themeMode);
@@ -57,7 +59,7 @@ export default function CurrencyPickerModal() {
   }, [searchQuery]);
 
   const handleSelect = (code: string) => {
-    triggerTactileFeedback();
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
     if (side === 'to') {
       setCurrencies(fromCurrency, code);
     } else {
@@ -77,7 +79,7 @@ export default function CurrencyPickerModal() {
           styles.currencyRow,
           {
             backgroundColor: isSelected ? tokens.accentOps : tokens.innerPanel,
-            borderBottomColor: tokens.inkBorder,
+            borderBottomColor: tokens.borderVisible,
             borderBottomWidth: 1.2,
           },
         ]}
@@ -86,15 +88,34 @@ export default function CurrencyPickerModal() {
 
         <View style={styles.currencyMeta}>
           <View style={styles.codeRow}>
-            <Text style={[styles.codeText, { color: tokens.inkBorder }]}>
+            <Text
+              style={[
+                styles.codeText,
+                {
+                  color: isSelected ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                },
+              ]}
+            >
               {item.code}
             </Text>
-            <Text style={[styles.symbolPill, { color: tokens.textSecondary }]}>
+            <Text
+              style={[
+                styles.symbolPill,
+                {
+                  color: isSelected ? tokens.keycapOperatorText : tokens.textSecondary,
+                },
+              ]}
+            >
               ({item.symbol})
             </Text>
           </View>
           <Text
-            style={[styles.nameText, { color: tokens.textSecondary }]}
+            style={[
+              styles.nameText,
+              {
+                color: isSelected ? tokens.keycapOperatorText : tokens.textSecondary,
+              },
+            ]}
             numberOfLines={1}
           >
             {displayName} • {item.country}
@@ -103,7 +124,7 @@ export default function CurrencyPickerModal() {
 
         {isSelected ? (
           <View style={styles.checkIcon}>
-            <Check size={18} color={tokens.inkBorder} strokeWidth={3} />
+            <Check size={18} color={tokens.keycapOperatorText} strokeWidth={3} />
           </View>
         ) : null}
       </Pressable>
@@ -121,7 +142,7 @@ export default function CurrencyPickerModal() {
             styles.headerBar,
             {
               backgroundColor: tokens.chassisSurface,
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible,
               borderWidth: hardwareConstants.borderWidth,
             },
           ]}
@@ -130,7 +151,12 @@ export default function CurrencyPickerModal() {
             {t('currency.select_currency', 'SELECT CURRENCY')} // {side.toUpperCase()}
           </Text>
 
-          <Pressable onPress={() => router.back()} style={styles.closeBtn}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.closeBtn}
+            hitSlop={8}
+            accessibilityLabel="Close picker"
+          >
             <X size={20} color="#FFFDF7" strokeWidth={2.8} />
           </Pressable>
         </View>
@@ -141,7 +167,7 @@ export default function CurrencyPickerModal() {
             styles.searchBar,
             {
               backgroundColor: tokens.innerPanel,
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible,
               borderWidth: hardwareConstants.borderWidth,
             },
           ]}
@@ -159,7 +185,7 @@ export default function CurrencyPickerModal() {
             autoFocus
           />
           {searchQuery ? (
-            <Pressable onPress={() => setSearchQuery('')}>
+            <Pressable onPress={() => setSearchQuery('')} hitSlop={6}>
               <X size={16} color={tokens.textSecondary} />
             </Pressable>
           ) : null}
@@ -178,12 +204,21 @@ export default function CurrencyPickerModal() {
                   styles.quickChip,
                   {
                     backgroundColor: isSelected ? tokens.accentOps : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible,
                     borderWidth: 1.5,
                   },
                 ]}
               >
-                <Text style={styles.quickChipText}>
+                <Text
+                  style={[
+                    styles.quickChipText,
+                    {
+                      color: isSelected
+                        ? tokens.keycapOperatorText
+                        : tokens.keycapNumberText,
+                    },
+                  ]}
+                >
                   {item?.flag} {code}
                 </Text>
               </Pressable>
@@ -203,7 +238,7 @@ export default function CurrencyPickerModal() {
           contentContainerStyle={[
             styles.listContent,
             {
-              borderColor: tokens.inkBorder,
+              borderColor: tokens.borderVisible,
               borderWidth: hardwareConstants.borderWidth,
             },
           ]}

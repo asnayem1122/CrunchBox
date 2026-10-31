@@ -118,7 +118,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                 styles.categoryTab,
                 {
                   backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible || tokens.inkBorder,
                   borderWidth: 1.8,
                   borderRadius: hardwareConstants.borderRadiusSm,
                   borderBottomWidth: isActive ? 1.8 : 3.5,
@@ -130,7 +130,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                 style={[
                   styles.categoryLabel,
                   {
-                    color: tokens.inkBorder,
+                    color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
                     fontWeight: isActive ? '900' : '700',
                   },
                 ]}
@@ -148,7 +148,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
           styles.unitCard,
           {
             backgroundColor: tokens.innerPanel,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible || tokens.inkBorder,
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
           },
@@ -175,7 +175,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                   styles.unitChip,
                   {
                     backgroundColor: isSelected ? tokens.accentOps : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible || tokens.inkBorder,
                     borderWidth: 1.5,
                     borderRadius: 4,
                   },
@@ -185,7 +185,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                   style={[
                     styles.unitChipText,
                     {
-                      color: tokens.inkBorder,
+                      color: isSelected ? tokens.keycapOperatorText : tokens.keycapNumberText,
                       fontWeight: isSelected ? '900' : '600',
                     },
                   ]}
@@ -222,7 +222,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
           styles.unitCard,
           {
             backgroundColor: tokens.innerPanel,
-            borderColor: tokens.inkBorder,
+            borderColor: tokens.borderVisible || tokens.inkBorder,
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
           },
@@ -249,7 +249,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                   styles.unitChip,
                   {
                     backgroundColor: isSelected ? tokens.accentOps : tokens.keypadSurface,
-                    borderColor: tokens.inkBorder,
+                    borderColor: tokens.borderVisible || tokens.inkBorder,
                     borderWidth: 1.5,
                     borderRadius: 4,
                   },
@@ -259,7 +259,7 @@ export const UnitConverterView: React.FC<UnitConverterViewProps> = ({
                   style={[
                     styles.unitChipText,
                     {
-                      color: tokens.inkBorder,
+                      color: isSelected ? tokens.keycapOperatorText : tokens.keycapNumberText,
                       fontWeight: isSelected ? '900' : '600',
                     },
                   ]}
@@ -322,20 +322,21 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   unitCard: {
-    padding: 12,
+    padding: 10,
     marginVertical: 4,
   },
   cardHeaderLabel: {
     fontSize: 9.5,
-    fontFamily: 'monospace',
     fontWeight: '900',
+    fontFamily: 'monospace',
     letterSpacing: 1,
     marginBottom: 6,
   },
   unitChipsScroll: {
     flexDirection: 'row',
     gap: 5,
-    paddingVertical: 4,
+    paddingVertical: 2,
+    marginBottom: 8,
   },
   unitChip: {
     paddingHorizontal: 8,
@@ -346,39 +347,37 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   inputRow: {
-    marginTop: 8,
-    alignItems: 'flex-end',
+    paddingVertical: 4,
   },
   numericInput: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '900',
     fontFamily: 'monospace',
     textAlign: 'right',
-    width: '100%',
     padding: 0,
   },
   numericOutput: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '900',
     fontFamily: 'monospace',
     textAlign: 'right',
-    width: '100%',
   },
   swapRow: {
     alignItems: 'center',
     marginVertical: 2,
   },
   footerFormulaBox: {
-    paddingHorizontal: 4,
-    marginTop: 8,
+    padding: 8,
+    alignItems: 'center',
+    marginTop: 4,
   },
   formulaText: {
     fontSize: 10,
     fontFamily: 'monospace',
-    fontWeight: '800',
+    fontWeight: '700',
   },
   landNoteText: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontFamily: 'monospace',
     marginTop: 2,
   },

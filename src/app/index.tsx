@@ -16,11 +16,15 @@ import {
   VolumeX,
   Sun,
   Moon,
+  BookOpen,
+  Activity,
 } from 'lucide-react-native';
 import { RuggedChassis } from '../components/chassis/RuggedChassis';
 import { LcdDisplay } from '../components/chassis/LcdDisplay';
 import { ModeSelector } from '../components/chassis/ModeSelector';
 import { PaperTapeDrawer } from '../components/chassis/PaperTapeDrawer';
+import { GuidebookModal } from '../features/guidebook/GuidebookModal';
+import { HardwareDiagnosticsModal } from '../features/diagnostics/HardwareDiagnosticsModal';
 import { KeypadView } from '../features/calculator/KeypadView';
 import { CurrencyView } from '../features/currency/CurrencyView';
 import { UnitConverterView } from '../features/units/UnitConverterView';
@@ -28,6 +32,7 @@ import { SmartToolsView } from '../features/tools/SmartToolsView';
 import { DevView } from '../features/dev/DevView';
 import { useAppStore } from '../store/useAppStore';
 import { toHexBinOct } from '../features/calculator/calcEngine';
+import { useLiveCalc } from '../features/calculator/useLiveCalc';
 import {
   computeAluOperation,
   formatBigIntBase,
@@ -61,6 +66,10 @@ export default function MainChassisScreen() {
     calcExpression,
     calcResult,
     calcMemory,
+    fractionMode,
+    fractionDisplay,
+    primeFactorsDisplay,
+    cycleFractionMode,
     angleMode,
     toggleAngleMode,
     calcError,
@@ -68,6 +77,10 @@ export default function MainChassisScreen() {
     refreshExchangeRates,
     ratesSource,
     ratesStale,
+    isGuidebookOpen,
+    setGuidebookOpen,
+    isDiagnosticsOpen,
+    setDiagnosticsOpen,
     // DEV State for LCD feed
     devBase,
     devWordSize,
@@ -79,6 +92,9 @@ export default function MainChassisScreen() {
   } = useAppStore();
 
   const tokens = getThemeTokens(themeMode);
+
+  // 0ms Speculative Live Auto-Compute hook
+  const liveCalc = useLiveCalc(calcExpression, angleMode);
 
   // Background non-blocking rates refresh on mount
   useEffect(() => {
@@ -129,6 +145,16 @@ export default function MainChassisScreen() {
     setIsTapeOpen((prev) => !prev);
   };
 
+  const handleOpenGuidebook = () => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
+    setGuidebookOpen(true);
+  };
+
+  const handleOpenDiagnostics = () => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
+    setDiagnosticsOpen(true);
+  };
+
   const handleToggleSound = () => {
     triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
     toggleSound();
@@ -152,37 +178,85 @@ export default function MainChassisScreen() {
       >
         {/* Top Hardware Quick Toolbar */}
         <View style={styles.topToolbar}>
-          {/* Paper Tape Drawer Toggle with Count Badge */}
-          <Pressable
-            accessible={true}
-            accessibilityLabel={`Paper Tape Drawer, ${paperTape.length} items`}
-            testID="toolbar-tape-button"
-            onPress={handleToggleTape}
-            style={[
-              styles.toolBtn,
-              {
-                backgroundColor: tokens.innerPanel,
-                borderColor: tokens.inkBorder,
-                borderWidth: 2,
-              },
-            ]}
-          >
-            <Receipt size={17} color={tokens.inkBorder} strokeWidth={2.5} />
-            <Text style={[styles.toolBtnText, { color: tokens.inkBorder }]}>
-              {t('tape.title', 'TAPE')}
-            </Text>
-            {paperTape.length > 0 ? (
-              <View
-                style={[
-                  styles.countBadge,
-                  { backgroundColor: tokens.accentOps, borderColor: tokens.inkBorder },
-                ]}
-              >
-                <Text style={styles.countBadgeText}>{paperTape.length}</Text>
-              </View>
-            ) : null}
-          </Pressable>
+          {/* Left Actions: Tape + Guidebook + QA Diagnostics */}
+          <View style={styles.toolBtnClusterLeft}>
+            {/* Paper Tape Drawer Toggle */}
+            <Pressable
+              accessible={true}
+              accessibilityLabel={`Paper Tape Drawer, ${paperTape.length} items`}
+              testID="toolbar-tape-button"
+              onPress={handleToggleTape}
+              style={[
+                styles.toolBtn,
+                {
+                  backgroundColor: tokens.innerPanel,
+                  borderColor: tokens.borderVisible,
+                  borderWidth: 2,
+                },
+              ]}
+            >
+              <Receipt size={15} color={tokens.keycapNumberText} strokeWidth={2.4} />
+              <Text style={[styles.toolBtnText, { color: tokens.keycapNumberText }]}>
+                {t('tape.tab', 'TAPE')}
+              </Text>
+              {paperTape.length > 0 ? (
+                <View
+                  style={[
+                    styles.countBadge,
+                    { backgroundColor: tokens.accentOps, borderColor: tokens.borderVisible },
+                  ]}
+                >
+                  <Text style={[styles.countBadgeText, { color: tokens.keycapOperatorText }]}>
+                    {paperTape.length}
+                  </Text>
+                </View>
+              ) : null}
+            </Pressable>
 
+            {/* Guidebook Button */}
+            <Pressable
+              accessible={true}
+              accessibilityLabel="Open User Guide"
+              testID="toolbar-guide-button"
+              onPress={handleOpenGuidebook}
+              style={[
+                styles.toolBtn,
+                {
+                  backgroundColor: tokens.innerPanel,
+                  borderColor: tokens.borderVisible,
+                  borderWidth: 2,
+                },
+              ]}
+            >
+              <BookOpen size={14} color={tokens.accentOps} strokeWidth={2.4} />
+              <Text style={[styles.toolBtnText, { color: tokens.keycapNumberText }]}>
+                {t('common.guide', 'GUIDE')}
+              </Text>
+            </Pressable>
+
+            {/* QA Diagnostics Button */}
+            <Pressable
+              accessible={true}
+              accessibilityLabel="Hardware Diagnostics"
+              testID="toolbar-diag-button"
+              onPress={handleOpenDiagnostics}
+              style={[
+                styles.toolBtn,
+                {
+                  backgroundColor: tokens.innerPanel,
+                  borderColor: tokens.borderVisible,
+                  borderWidth: 2,
+                },
+              ]}
+            >
+              <Activity size={14} color={tokens.actionGreen} strokeWidth={2.4} />
+              <Text style={[styles.toolBtnText, { color: tokens.keycapNumberText }]}>
+                QA
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Right Actions: Audio + Theme + Settings */}
           <View style={styles.toolBtnCluster}>
             {/* Audio Toggle */}
             <Pressable
@@ -194,15 +268,15 @@ export default function MainChassisScreen() {
                 styles.iconBtn,
                 {
                   backgroundColor: tokens.innerPanel,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible,
                   borderWidth: 2,
                 },
               ]}
             >
               {soundEnabled ? (
-                <Volume2 size={16} color={tokens.inkBorder} strokeWidth={2.4} />
+                <Volume2 size={15} color={tokens.keycapNumberText} strokeWidth={2.4} />
               ) : (
-                <VolumeX size={16} color={tokens.dangerRed} strokeWidth={2.4} />
+                <VolumeX size={15} color={tokens.dangerRed} strokeWidth={2.4} />
               )}
             </Pressable>
 
@@ -216,15 +290,15 @@ export default function MainChassisScreen() {
                 styles.iconBtn,
                 {
                   backgroundColor: tokens.innerPanel,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible,
                   borderWidth: 2,
                 },
               ]}
             >
               {themeMode === 'field' ? (
-                <Moon size={16} color={tokens.inkBorder} strokeWidth={2.4} />
+                <Moon size={15} color={tokens.keycapNumberText} strokeWidth={2.4} />
               ) : (
-                <Sun size={16} color={tokens.accentOps} strokeWidth={2.4} />
+                <Sun size={15} color={tokens.accentOps} strokeWidth={2.4} />
               )}
             </Pressable>
 
@@ -238,12 +312,12 @@ export default function MainChassisScreen() {
                 styles.iconBtn,
                 {
                   backgroundColor: tokens.accentOps,
-                  borderColor: tokens.inkBorder,
+                  borderColor: tokens.borderVisible,
                   borderWidth: 2,
                 },
               ]}
             >
-              <SettingsIcon size={16} color={tokens.inkBorder} strokeWidth={2.6} />
+              <SettingsIcon size={15} color={tokens.keycapOperatorText} strokeWidth={2.6} />
             </Pressable>
           </View>
         </View>
@@ -257,6 +331,11 @@ export default function MainChassisScreen() {
           <LcdDisplay
             expression={activeMode === 'DEV' ? `REG ${devActiveRegister} [${devBase}]` : calcExpression}
             value={devLcdDisplayValue}
+            liveAnswer={activeMode === 'CALC' || activeMode === 'SCI' ? liveCalc.liveAnswer : null}
+            fractionMode={fractionMode}
+            fractionDisplay={fractionDisplay}
+            primeFactorsDisplay={primeFactorsDisplay}
+            onCycleFractionMode={cycleFractionMode}
             mode={activeMode}
             angleMode={angleMode}
             onToggleAngleMode={toggleAngleMode}
@@ -314,6 +393,20 @@ export default function MainChassisScreen() {
         onClose={() => setIsTapeOpen(false)}
         themeMode={themeMode}
       />
+
+      {/* Interactive Guidebook Modal */}
+      <GuidebookModal
+        isOpen={isGuidebookOpen}
+        onClose={() => setGuidebookOpen(false)}
+        themeMode={themeMode}
+      />
+
+      {/* In-App Automated Diagnostics QA Modal */}
+      <HardwareDiagnosticsModal
+        isOpen={isDiagnosticsOpen}
+        onClose={() => setDiagnosticsOpen(false)}
+        themeMode={themeMode}
+      />
     </SafeAreaView>
   );
 }
@@ -329,46 +422,50 @@ const styles = StyleSheet.create({
   },
   topToolbar: {
     width: '100%',
-    maxWidth: 440,
+    maxWidth: 480,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
+  toolBtnClusterLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   toolBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    gap: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    gap: 4,
   },
   toolBtnText: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'monospace',
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   countBadge: {
-    paddingHorizontal: 5,
+    paddingHorizontal: 4,
     paddingVertical: 1,
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
   },
   countBadgeText: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: 'monospace',
     fontWeight: '900',
-    color: '#1B241E',
   },
   toolBtnCluster: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   iconBtn: {
-    padding: 7,
-    borderRadius: 8,
+    padding: 6,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },

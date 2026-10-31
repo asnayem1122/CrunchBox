@@ -1,5 +1,8 @@
-import { useWindowDimensions, PixelRatio, Platform } from 'react-native';
+import { useWindowDimensions, PixelRatio, Platform, StatusBar } from 'react-native';
 import { useSafeAreaInsets, EdgeInsets } from 'react-native-safe-area-context';
+
+// Module-level high-water mark so Android status bar inset never drops to 0 on modal exit
+let lockedAndroidTopInset = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 28) : 20;
 
 export interface HardwareLayoutMetrics {
   width: number;
@@ -35,6 +38,11 @@ export function useHardwareLayout(): HardwareLayoutMetrics {
   const isCompact = width < 375;
   const isTablet = width >= 600;
 
+  // Track high-water mark on Android so screen transitions never shrink safeTop
+  if (Platform.OS === 'android' && insets.top > lockedAndroidTopInset) {
+    lockedAndroidTopInset = insets.top;
+  }
+
   // Compute keycap vertical height so standard 5-row keypads fit comfortably without overflow
   const availableVerticalForKeys = height - insets.top - insets.bottom - 280; // approximate upper deck allowance
   const computedKeycapHeight = Math.min(Math.max(Math.floor(availableVerticalForKeys / 6), 46), 66);
@@ -42,7 +50,9 @@ export function useHardwareLayout(): HardwareLayoutMetrics {
   const chassisPadding = isCompact ? 10 : 14;
   const lcdMinHeight = isCompact ? 110 : 130;
 
-  const safeTopInset = Math.max(insets.top, Platform.OS === 'android' ? 12 : 20);
+  const safeTopInset = Platform.OS === 'android'
+    ? Math.max(insets.top, lockedAndroidTopInset, StatusBar.currentHeight ?? 28, 28)
+    : Math.max(insets.top, 20);
   const safeBottomInset = Math.max(insets.bottom, 12);
 
   return {

@@ -8,7 +8,7 @@
 [![Expo - SDK 52](https://img.shields.io/badge/Expo-SDK%2052-1B241E?style=for-the-badge&logo=expo)](https://expo.dev/)
 [![React Native - 0.76](https://img.shields.io/badge/React%20Native-0.76.6-61DAFB?style=for-the-badge&logo=react)](https://reactnative.dev/)
 [![TypeScript - 5.3](https://img.shields.io/badge/TypeScript-5.3%20Strict-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tests - 132 Passed](https://img.shields.io/badge/Tests-132%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
+[![Tests - 132 Passed](https://img.shields.io/badge/Tests-154%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
 [![License - MIT](https://img.shields.io/badge/License-MIT-D99E32?style=for-the-badge)](LICENSE)
 
 ---
@@ -23,6 +23,10 @@ Inspired by vintage military telemetry equipment and neo-brutalist hardware aest
 - **Recessed LCD annunciator screen** with 3 tactical backlight modes (*Sage Daylight*, *Amber Field Glow*, *Night-Ops Stealth*).
 - **64-bit CSE Systems Workbench** for multi-base radix conversion, hardware ALU flags, IEEE-754 floating point inspection, interactive bit grids, and pure-TS UTF-8 encoding.
 - **Regional Bangladeshi Land Math** alongside international SI and Imperial standards.
+- **Casio fx-991EX ClassWiz Suite:** Instant $S \Leftrightarrow D$ decimal-to-fraction conversions, `FACT` prime power factorization ($60 = 2^2 \times 3 \times 5$), multiplicative combinatorics ($n\text{C}r$, $n\text{P}r$), and universal physical constants ($c, g, h, N_A, \pi, e$).
+- **0ms Speculative Live Auto-Compute:** Displays real-time `ans ≈ ...` previews before pressing equals.
+- **Fast History Paper Tape Manager:** Search query filtering, mode tabs (`ALL`, `CALC`, `SCI`, `DEV`, `CURR`, `UNIT`, `TOOLS`), and 4 quick actions (`+ Use Ans`, `✏ Edit Expr`, `📋 Copy`, `★ Pin`).
+- **In-App QA Diagnostics & Telemetry:** Built-in hardware telemetry panel and 15-point automated self-test runner.
 
 ---
 
