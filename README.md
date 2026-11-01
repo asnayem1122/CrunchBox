@@ -95,12 +95,14 @@ Inspired by vintage military telemetry equipment and neo-brutalist hardware aest
 
 ### 3. `DEV` — CSE Systems & Architecture Workbench
 Designed specifically for Computer Science & Engineering students, systems programmers, and low-level engineers:
+- **Direct Binary Calculation Section (`BIN CALC`):** Dual universal operands with independent base selection (`BIN`, `DEC`, `HEX`, `OCT`, `ASCII`), column-aligned bit-level truth table, and direct arithmetic/logic evaluation (`+`, `-`, `*`, `/`, `%`, `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `XNOR`, `SHL`, `SHR`, `SAR`, `ROL`, `ROR`, `ENDIAN`).
 - **64-bit Multi-Base Radix Engine:** Seamless conversion across `HEX`, `DEC`, `OCT`, and `BIN` with nibble spacing (`1111 0000`) and strict keypad digit locking (invalid keys dimmed and disabled).
 - **ALU Logic & Hardware Flags:**
-  - Operations: `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `XNOR`, `SHL`, `SHR`, `ROR`, `ROL`, and `ENDIAN_SWAP`.
-  - Flags: `ZF` (Zero Flag), `SF` (Sign Flag), `CF` (Carry Flag: `null`/`—` on logic ops, accurate on arithmetic), and `OF` (Signed Two's Complement Overflow).
+  - Operations: `ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `XNOR`, `SHL`, `SHR`, `SAR`, `ROR`, `ROL`, and `ENDIAN_SWAP`.
+  - Flags: `ZF` (Zero Flag), `SF` (Sign Flag), `CF` (Carry Flag: `null`/`—` on logic ops, accurate borrow/carry on arithmetic), and `OF` (Signed Two's Complement Overflow).
+  - Explicit divide-by-zero fault detection (`DIV_BY_ZERO`).
 - **IEEE-754 Single-Precision Float Inspector:** Hardware-accurate 32-bit floating point decomposition showing Sign (1b), Exponent (8b), Mantissa (23b), and 32-bit Hex (`-12.375` $\rightarrow$ `0xC1460000`).
-- **Interactive 64-bit Bit Grid:** Visual 8-bits-per-row grid with tappable bit flips and bit position labels (`63..0`).
+- **Interactive 64-bit Bit Grid & Truth Table:** Visual bit manipulation with tappable bit flips and bit position labels (`63..0`).
 - **Pure-TS Multi-Byte UTF-8 Codec:** Zero-dependency encoder and decoder converting strings to hex/binary byte arrays (supports Unicode and Bengali `'বাংলা'`).
 - **Discrete Math:** Modular arithmetic, GCD, LCM, Prime verification with smallest factor, and powers of two.
 

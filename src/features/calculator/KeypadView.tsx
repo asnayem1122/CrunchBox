@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TactileButton } from '../../components/ui/TactileButton';
@@ -19,30 +19,27 @@ const CONSTANTS_LIST = [
   { symbol: 'NA', val: 'na', label: 'Avogadro' },
 ];
 
-export const KeypadView: React.FC<KeypadViewProps> = ({ themeMode = 'field' }) => {
+const KeypadViewComponent: React.FC<KeypadViewProps> = ({ themeMode = 'field' }) => {
   const { t } = useTranslation();
   const tokens = getThemeTokens(themeMode);
 
-  const {
-    activeMode,
-    angleMode,
-    fractionMode,
-    inputCalcKey,
-    evaluateCalc,
-    clearCalc,
-    deleteCalcLast,
-    cycleFractionMode,
-    primeFactorizeCalc,
-    toggleAngleMode,
-    memoryAdd,
-    memorySubtract,
-    memoryRecall,
-    memoryClear,
-    sendCalcToCurrency,
-    calcResult,
-    soundEnabled,
-    hapticsEnabled,
-  } = useAppStore();
+  // Atomic selectors - KeypadView does NOT subscribe to expression or result,
+  // preventing all 35 buttons from re-rendering during keystrokes!
+  const activeMode = useAppStore((s) => s.activeMode);
+  const fractionMode = useAppStore((s) => s.fractionMode);
+  const inputCalcKey = useAppStore((s) => s.inputCalcKey);
+  const evaluateCalc = useAppStore((s) => s.evaluateCalc);
+  const clearCalc = useAppStore((s) => s.clearCalc);
+  const deleteCalcLast = useAppStore((s) => s.deleteCalcLast);
+  const cycleFractionMode = useAppStore((s) => s.cycleFractionMode);
+  const primeFactorizeCalc = useAppStore((s) => s.primeFactorizeCalc);
+  const memoryAdd = useAppStore((s) => s.memoryAdd);
+  const memorySubtract = useAppStore((s) => s.memorySubtract);
+  const memoryRecall = useAppStore((s) => s.memoryRecall);
+  const memoryClear = useAppStore((s) => s.memoryClear);
+  const sendCalcToCurrency = useAppStore((s) => s.sendCalcToCurrency);
+  const soundEnabled = useAppStore((s) => s.soundEnabled);
+  const hapticsEnabled = useAppStore((s) => s.hapticsEnabled);
 
   const isScientific = activeMode === 'SCI';
 
@@ -87,231 +84,442 @@ export const KeypadView: React.FC<KeypadViewProps> = ({ themeMode = 'field' }) =
           textStyle={styles.memoryBtnText}
         />
         <TactileButton
-          label={fractionMode !== 'DEC' ? `S⇔D:${fractionMode}` : 'S⇔D'}
-          variant="secondary"
+          label="S⇔D"
+          subtitle={fractionMode !== 'DEC' ? fractionMode : undefined}
+          variant="action"
           flex={1.3}
           height={38}
           themeMode={themeMode}
           onPress={cycleFractionMode}
-          textStyle={styles.sdBtnText}
+          textStyle={styles.actionBtnText}
+          testID="btn-sd-toggle"
         />
         <TactileButton
-          label={t('calc.send_to_curr', 'SEND -> CURR')}
-          variant="operator"
+          label="SEND -> CURR"
+          variant="action"
           flex={1.7}
           height={38}
           themeMode={themeMode}
           onPress={sendCalcToCurrency}
           textStyle={styles.sendBtnText}
+          testID="btn-send-curr"
         />
       </View>
 
-      {/* 2. Scientific Deck with Casio fx-991EX ClassWiz Suite (rendered in SCI mode) */}
+      {/* 2. Scientific Tier Keys (fx-991EX ClassWiz Extended Keys) */}
       {isScientific ? (
         <View style={styles.sciDeck}>
-          {/* Scientific Constants Chip Bar */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.constChipScroll}
-            style={[
-              styles.constChipBar,
-              {
-                backgroundColor: tokens.innerPanel,
-                borderColor: tokens.borderVisible,
-              },
-            ]}
-          >
-            <Text style={[styles.constBarLabel, { color: tokens.textSecondary }]}>
-              CONST:
-            </Text>
-            {CONSTANTS_LIST.map((item) => (
+          {/* Row 1: Combinatorics, Factorization, Powers */}
+          <View style={styles.keyRow}>
+            <TactileButton
+              label="nCr"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('nCr')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="nPr"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('nPr')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="FACT"
+              variant="action"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={primeFactorizeCalc}
+              textStyle={styles.sciBtnText}
+              testID="btn-sci-fact"
+            />
+            <TactileButton
+              label="x!"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('!')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="1/x"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('^(-1)')}
+              textStyle={styles.sciBtnText}
+            />
+          </View>
+
+          {/* Row 2: Trig Functions & Logarithms */}
+          <View style={styles.keyRow}>
+            <TactileButton
+              label="sin"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('sin(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="cos"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('cos(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="tan"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('tan(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="ln"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('ln(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="log"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('log(')}
+              textStyle={styles.sciBtnText}
+            />
+          </View>
+
+          {/* Row 3: Roots, Powers, Parentheses */}
+          <View style={styles.keyRow}>
+            <TactileButton
+              label="√"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('sqrt(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="x²"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('^2')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="xʸ"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('^')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label="("
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey('(')}
+              textStyle={styles.sciBtnText}
+            />
+            <TactileButton
+              label=")"
+              variant="secondary"
+              flex={1}
+              height={42}
+              themeMode={themeMode}
+              onPress={() => inputCalcKey(')')}
+              textStyle={styles.sciBtnText}
+            />
+          </View>
+
+          {/* Row 4: Constants Chips Bar (Casio fx-991EX physical constants) */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.constantsBar}>
+            {CONSTANTS_LIST.map((c) => (
               <Pressable
-                key={item.symbol}
+                key={c.symbol}
                 accessible={true}
-                accessibilityLabel={`Constant ${item.label}`}
-                testID={`calc-const-${item.val}`}
+                accessibilityLabel={`Constant ${c.label} (${c.symbol})`}
+                testID={`const-${c.symbol}`}
                 onPress={() => {
                   triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
-                  inputCalcKey(item.val);
+                  inputCalcKey(c.val);
                 }}
                 style={[
                   styles.constChip,
                   {
-                    backgroundColor: tokens.keypadSurface,
+                    backgroundColor: tokens.innerPanel,
                     borderColor: tokens.borderVisible,
                   },
                 ]}
               >
-                <Text style={[styles.constChipText, { color: tokens.keycapNumberText }]}>
-                  {item.symbol}
-                  <Text style={[styles.constChipSub, { color: tokens.textSecondary }]}>
-                    {' '}{item.label}
-                  </Text>
-                </Text>
+                <Text style={[styles.constChipSymbol, { color: tokens.textPrimary }]}>{c.symbol}</Text>
+                <Text style={[styles.constChipLabel, { color: tokens.textSecondary }]}>{c.label}</Text>
               </Pressable>
             ))}
           </ScrollView>
-
-          {/* Sci Row 1: Trig + Combinatorics */}
-          <View style={styles.gridRow}>
-            <TactileButton label="sin" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('sin(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="cos" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('cos(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="tan" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('tan(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="nCr" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey(' nCr ')} textStyle={styles.sciBtnText} />
-            <TactileButton label="nPr" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey(' nPr ')} textStyle={styles.sciBtnText} />
-          </View>
-
-          {/* Sci Row 2: Powers, Roots, Logs */}
-          <View style={styles.gridRow}>
-            <TactileButton label="ln" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('ln(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="log" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('log(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="x²" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('^2')} textStyle={styles.sciBtnText} />
-            <TactileButton label="xʸ" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('^')} textStyle={styles.sciBtnText} />
-            <TactileButton label="√" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('√(')} textStyle={styles.sciBtnText} />
-          </View>
-
-          {/* Sci Row 3: FACT (Prime Factorize), cbrt, factorial, parens */}
-          <View style={styles.gridRow}>
-            <TactileButton label="FACT" variant="operator" flex={1} height={42} themeMode={themeMode} onPress={primeFactorizeCalc} textStyle={styles.factBtnText} />
-            <TactileButton label="∛" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('cbrt(')} textStyle={styles.sciBtnText} />
-            <TactileButton label="n!" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('!')} textStyle={styles.sciBtnText} />
-            <TactileButton label="(" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey('(')} textStyle={styles.sciBtnText} />
-            <TactileButton label=")" variant="secondary" flex={1} height={42} themeMode={themeMode} onPress={() => inputCalcKey(')')} textStyle={styles.sciBtnText} />
-          </View>
         </View>
       ) : null}
 
-      {/* 3. Standard 4x5 Heavy-Duty Keypad */}
-      <View style={styles.standardKeypad}>
+      {/* 3. Primary Keypad Matrix (Standard Field Calculator) */}
+      <View style={styles.primaryGrid}>
         {/* Row 1 */}
-        <View style={styles.gridRow}>
-          <TactileButton label="AC" variant="danger" flex={1} height={50} themeMode={themeMode} onPress={clearCalc} textStyle={styles.actionBtnText} />
-          <TactileButton label="DEL" variant="danger" flex={1} height={50} themeMode={themeMode} onPress={deleteCalcLast} textStyle={styles.actionBtnText} />
-          <TactileButton label="%" variant="secondary" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('%')} />
-          <TactileButton label="÷" variant="operator" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('÷')} />
+        <View style={styles.keyRow}>
+          <TactileButton
+            label="AC"
+            variant="danger"
+            flex={1}
+            themeMode={themeMode}
+            onPress={clearCalc}
+            testID="btn-ac"
+          />
+          <TactileButton
+            label="DEL"
+            variant="danger"
+            flex={1}
+            themeMode={themeMode}
+            onPress={deleteCalcLast}
+            testID="btn-del"
+          />
+          <TactileButton
+            label="%"
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('%')}
+            testID="btn-pct"
+          />
+          <TactileButton
+            label="÷"
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('÷')}
+            testID="btn-div"
+          />
         </View>
 
         {/* Row 2 */}
-        <View style={styles.gridRow}>
-          <TactileButton label="7" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('7')} />
-          <TactileButton label="8" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('8')} />
-          <TactileButton label="9" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('9')} />
-          <TactileButton label="×" variant="operator" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('×')} />
+        <View style={styles.keyRow}>
+          <TactileButton
+            label="7"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('7')}
+            testID="btn-7"
+          />
+          <TactileButton
+            label="8"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('8')}
+            testID="btn-8"
+          />
+          <TactileButton
+            label="9"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('9')}
+            testID="btn-9"
+          />
+          <TactileButton
+            label="×"
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('×')}
+            testID="btn-mul"
+          />
         </View>
 
         {/* Row 3 */}
-        <View style={styles.gridRow}>
-          <TactileButton label="4" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('4')} />
-          <TactileButton label="5" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('5')} />
-          <TactileButton label="6" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('6')} />
-          <TactileButton label="−" variant="operator" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('−')} />
+        <View style={styles.keyRow}>
+          <TactileButton
+            label="4"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('4')}
+            testID="btn-4"
+          />
+          <TactileButton
+            label="5"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('5')}
+            testID="btn-5"
+          />
+          <TactileButton
+            label="6"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('6')}
+            testID="btn-6"
+          />
+          <TactileButton
+            label="−"
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('−')}
+            testID="btn-sub"
+          />
         </View>
 
         {/* Row 4 */}
-        <View style={styles.gridRow}>
-          <TactileButton label="1" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('1')} />
-          <TactileButton label="2" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('2')} />
-          <TactileButton label="3" variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('3')} />
-          <TactileButton label="+" variant="operator" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('+')} />
+        <View style={styles.keyRow}>
+          <TactileButton
+            label="1"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('1')}
+            testID="btn-1"
+          />
+          <TactileButton
+            label="2"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('2')}
+            testID="btn-2"
+          />
+          <TactileButton
+            label="3"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('3')}
+            testID="btn-3"
+          />
+          <TactileButton
+            label="+"
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('+')}
+            testID="btn-add"
+          />
         </View>
 
         {/* Row 5 */}
-        <View style={styles.gridRow}>
-          <TactileButton label="0" variant="number" flex={2} height={50} themeMode={themeMode} onPress={() => inputCalcKey('0')} />
-          <TactileButton label="." variant="number" flex={1} height={50} themeMode={themeMode} onPress={() => inputCalcKey('.')} />
-          <TactileButton label="=" variant="action" flex={1} height={50} themeMode={themeMode} onPress={evaluateCalc} textStyle={styles.equalsBtnText} />
+        <View style={styles.keyRow}>
+          <TactileButton
+            label="0"
+            flex={2}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('0')}
+            testID="btn-0"
+          />
+          <TactileButton
+            label="."
+            flex={1}
+            themeMode={themeMode}
+            onPress={() => inputCalcKey('.')}
+            testID="btn-dot"
+          />
+          <TactileButton
+            label="="
+            variant="operator"
+            flex={1}
+            themeMode={themeMode}
+            onPress={evaluateCalc}
+            testID="btn-equals"
+          />
         </View>
       </View>
     </View>
   );
 };
 
+export const KeypadView = memo(KeypadViewComponent, (prev, next) => {
+  return prev.themeMode === next.themeMode;
+});
+
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginTop: 6,
+    paddingTop: 4,
   },
   topActionBar: {
     flexDirection: 'row',
     gap: 5,
-    marginBottom: 7,
+    marginBottom: 6,
   },
   memoryBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
   },
-  sdBtnText: {
-    fontSize: 9.5,
+  actionBtnText: {
+    fontSize: 12,
     fontWeight: '900',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
   sendBtnText: {
     fontSize: 9.5,
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   sciDeck: {
-    gap: 5,
-    marginBottom: 7,
+    gap: 4,
+    marginBottom: 6,
   },
-  constChipBar: {
+  keyRow: {
     flexDirection: 'row',
-    padding: 4,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    marginBottom: 2,
-  },
-  constChipScroll: {
-    alignItems: 'center',
-    gap: 5,
-  },
-  constBarLabel: {
-    fontSize: 9,
-    fontFamily: 'monospace',
-    fontWeight: '900',
-    marginRight: 4,
-    alignSelf: 'center',
-  },
-  constChip: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 4,
-    borderWidth: 1.2,
-  },
-  constChipText: {
-    fontSize: 10,
-    fontFamily: 'monospace',
-    fontWeight: '900',
-  },
-  constChipSub: {
-    fontSize: 8,
-    fontFamily: 'monospace',
-    fontWeight: '600',
-  },
-  standardKeypad: {
-    gap: 7,
-  },
-  gridRow: {
-    flexDirection: 'row',
-    gap: 7,
-    width: '100%',
+    gap: 6,
+    marginBottom: 6,
   },
   sciBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
   },
-  factBtnText: {
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 0.5,
+  constantsBar: {
+    flexDirection: 'row',
+    paddingVertical: 2,
+    marginBottom: 2,
   },
-  actionBtnText: {
-    fontSize: 13,
+  constChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    borderWidth: 1.2,
+    marginRight: 6,
+  },
+  constChipSymbol: {
+    fontSize: 12,
+    fontFamily: 'monospace',
     fontWeight: '900',
   },
-  equalsBtnText: {
-    fontSize: 24,
-    fontWeight: '900',
+  constChipLabel: {
+    fontSize: 8.5,
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    opacity: 0.8,
+  },
+  primaryGrid: {
+    gap: 2,
   },
 });

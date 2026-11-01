@@ -104,7 +104,7 @@ const TactileButtonComponent: React.FC<TactileButtonProps> = ({
     onPress?.();
   };
 
-  const shadowHeight = 4;
+  const shadowHeight = 3.5;
   const keycapHeight = height - shadowHeight;
 
   return (
@@ -134,7 +134,7 @@ const TactileButtonComponent: React.FC<TactileButtonProps> = ({
         ]}
       />
 
-      {/* 2. Depressing Keycap Face - Translates down 3px inside fixed outer container */}
+      {/* 2. Depressing Keycap Face - Translates down 2.5px via transform only (zero layout reflow) */}
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -149,7 +149,7 @@ const TactileButtonComponent: React.FC<TactileButtonProps> = ({
             borderWidth: hardwareConstants.borderWidth,
             borderRadius: hardwareConstants.borderRadiusMd,
             height: keycapHeight,
-            transform: [{ translateY: isPressed ? 3 : 0 }],
+            transform: [{ translateY: isPressed ? 2.5 : 0 }],
           },
         ]}
       >
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   outerContainer: {
     position: 'relative',
     justifyContent: 'flex-start',
+    overflow: 'hidden',
   },
   shadowBase: {
     position: 'absolute',

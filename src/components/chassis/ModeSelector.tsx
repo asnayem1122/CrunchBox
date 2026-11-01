@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
@@ -45,7 +45,7 @@ const MODES_ROW2: ModeDef[] = [
   { id: 'TOOLS', labelKey: 'modes.tools', defaultLabel: 'TOOLS', iconSymbol: '⚙' },
 ];
 
-export const ModeSelector: React.FC<ModeSelectorProps> = ({
+const ModeSelectorComponent: React.FC<ModeSelectorProps> = ({
   activeMode,
   onChangeMode,
   themeMode = 'field',
@@ -67,52 +67,64 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
     const label = t(item.labelKey, item.defaultLabel);
 
     return (
-      <Pressable
-        key={item.id}
-        accessible={true}
-        accessibilityRole="tab"
-        accessibilityLabel={`${label} mode`}
-        accessibilityState={{ selected: isActive }}
-        testID={`mode-tab-${item.id.toLowerCase()}`}
-        onPress={() => handleSelect(item.id)}
-        style={[
-          styles.tabButton,
-          {
-            backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-            borderColor: tokens.borderVisible || tokens.inkBorder,
-            borderWidth: 2,
-            borderRadius: hardwareConstants.borderRadiusSm,
-            borderBottomWidth: isActive ? 2 : 4,
-            transform: [{ translateY: isActive ? 2 : 0 }],
-          },
-        ]}
-      >
-        <View style={styles.tabContentRow}>
-          {/* Status LED Pip */}
-          <View
-            style={[
-              styles.ledPip,
-              {
-                backgroundColor: isActive ? tokens.ledActive : tokens.ledInactive,
-                borderColor: tokens.borderVisible || tokens.inkBorder,
-              },
-            ]}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              {
-                color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
-                fontWeight: isActive ? '900' : '700',
-              },
-            ]}
-            numberOfLines={1}
-            maxFontSizeMultiplier={1.2}
-          >
-            {item.iconSymbol} {label}
-          </Text>
-        </View>
-      </Pressable>
+      <View key={item.id} style={styles.tabOuterSlot}>
+        {/* 1. Static shadow plate at bottom (fixed height) */}
+        <View
+          style={[
+            styles.tabShadowPlate,
+            {
+              backgroundColor: tokens.inkShadow,
+              borderRadius: hardwareConstants.borderRadiusSm,
+            },
+          ]}
+        />
+
+        {/* 2. Keycap face - fixed height, movement via translateY only (0 layout reflow) */}
+        <Pressable
+          accessible={true}
+          accessibilityRole="tab"
+          accessibilityLabel={`${label} mode`}
+          accessibilityState={{ selected: isActive }}
+          testID={`mode-tab-${item.id.toLowerCase()}`}
+          onPress={() => handleSelect(item.id)}
+          style={[
+            styles.tabButton,
+            {
+              backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
+              borderColor: tokens.borderVisible || tokens.inkBorder,
+              borderWidth: 2,
+              borderRadius: hardwareConstants.borderRadiusSm,
+              transform: [{ translateY: isActive ? 2 : 0 }],
+            },
+          ]}
+        >
+          <View style={styles.tabContentRow}>
+            {/* Status LED Pip */}
+            <View
+              style={[
+                styles.ledPip,
+                {
+                  backgroundColor: isActive ? tokens.ledActive : tokens.ledInactive,
+                  borderColor: tokens.borderVisible || tokens.inkBorder,
+                },
+              ]}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                {
+                  color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                  fontWeight: isActive ? '900' : '700',
+                },
+              ]}
+              numberOfLines={1}
+              maxFontSizeMultiplier={1.2}
+            >
+              {item.iconSymbol} {label}
+            </Text>
+          </View>
+        </Pressable>
+      </View>
     );
   };
 
@@ -139,6 +151,16 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
   );
 };
 
+export const ModeSelector = memo(ModeSelectorComponent, (prev, next) => {
+  return (
+    prev.activeMode === next.activeMode &&
+    prev.themeMode === next.themeMode &&
+    prev.soundEnabled === next.soundEnabled &&
+    prev.hapticsEnabled === next.hapticsEnabled &&
+    prev.style === next.style
+  );
+});
+
 const styles = StyleSheet.create({
   deckContainer: {
     padding: 5,
@@ -151,10 +173,21 @@ const styles = StyleSheet.create({
     gap: 5,
     width: '100%',
   },
-  tabButton: {
+  tabOuterSlot: {
     flex: 1,
-    minHeight: 36,
-    paddingVertical: 5,
+    height: 38,
+    position: 'relative',
+  },
+  tabShadowPlate: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 36,
+  },
+  tabButton: {
+    width: '100%',
+    height: 35,
     paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',

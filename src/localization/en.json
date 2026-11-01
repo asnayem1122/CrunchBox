@@ -24,7 +24,16 @@
     "bit_grid": "INTERACTIVE BIT GRID",
     "word_size": "Word Size",
     "send_to_calc": "SEND TO CALC",
-    "send_to_curr": "SEND TO CURR"
+    "send_to_curr": "SEND TO CURR",
+    "subdeck_bin_calc": "BIN CALC",
+    "bin_calc_title": "DIRECT BINARY CALCULATOR",
+    "operand_a": "OPERAND A",
+    "operand_b": "OPERAND B",
+    "result": "BINARY RESULT",
+    "swap": "SWAP A ⇄ B",
+    "ans_to_a": "ANS → A",
+    "bit_truth_table": "BIT ALIGNMENT & LOGIC GRID",
+    "div_by_zero": "ERR: DIV BY 0"
   },
   "calc": {
     "send_to_curr": "SEND -> CURR",

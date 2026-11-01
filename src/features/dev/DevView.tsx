@@ -8,11 +8,12 @@ import {
   Share,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Copy, ArrowRight, Check, Hash, Cpu, Binary, FileText, Compass } from 'lucide-react-native';
+import { Copy, ArrowRight, Check, Hash, Cpu, Binary, FileText, Compass, Calculator } from 'lucide-react-native';
 import {
   useAppStore,
   DevSubDeck,
 } from '../../store/useAppStore';
+import { DirectBinaryCalcView } from './DirectBinaryCalcView';
 import {
   DevBase,
   DevWordSize,
@@ -153,9 +154,10 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
 
   // Sub-deck Selector Tabs
   const SUB_DECKS: Array<{ id: DevSubDeck; label: string; icon: any }> = [
+    { id: 'BIN_CALC', label: t('dev.subdeck_bin_calc', 'BIN CALC'), icon: Binary },
     { id: 'BASES', label: t('dev.subdeck_bases', 'BASES'), icon: Hash },
     { id: 'ALU', label: t('dev.subdeck_alu', 'ALU & BITS'), icon: Cpu },
-    { id: 'FLOAT', label: t('dev.subdeck_float', 'IEEE-754'), icon: Binary },
+    { id: 'FLOAT', label: t('dev.subdeck_float', 'IEEE-754'), icon: Calculator },
     { id: 'TEXT', label: t('dev.subdeck_text', 'TEXT CODEC'), icon: FileText },
     { id: 'DISCRETE', label: t('dev.subdeck_discrete', 'DISCRETE'), icon: Compass },
   ];
@@ -168,7 +170,7 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
       {/* Upper Hardware Sub-Deck Selector */}
       <View
         style={[
-          styles.subDeckBar,
+          styles.subDeckBarWrapper,
           {
             backgroundColor: tokens.innerPanel,
             borderColor: tokens.borderVisible,
@@ -177,48 +179,54 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
           },
         ]}
       >
-        {SUB_DECKS.map((tab) => {
-          const isActive = tab.id === devSubDeck;
-          const Icon = tab.icon;
-          return (
-            <Pressable
-              key={tab.id}
-              accessible={true}
-              accessibilityLabel={`Subdeck ${tab.label}`}
-              testID={`dev-subdeck-${tab.id.toLowerCase()}`}
-              onPress={() => {
-                triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
-                setDevSubDeck(tab.id);
-              }}
-              style={[
-                styles.subDeckTab,
-                {
-                  backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
-                  borderColor: tokens.borderVisible,
-                  borderWidth: 1.5,
-                  borderRadius: hardwareConstants.borderRadiusSm,
-                  borderBottomWidth: isActive ? 1.5 : 3,
-                  transform: [{ translateY: isActive ? 1.5 : 0 }],
-                },
-              ]}
-            >
-              <Icon size={12} color={isActive ? tokens.keycapOperatorText : tokens.keycapNumberText} strokeWidth={2.5} />
-              <Text
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.subDeckBar}
+        >
+          {SUB_DECKS.map((tab) => {
+            const isActive = tab.id === devSubDeck;
+            const Icon = tab.icon;
+            return (
+              <Pressable
+                key={tab.id}
+                accessible={true}
+                accessibilityLabel={`Subdeck ${tab.label}`}
+                testID={`dev-subdeck-${tab.id.toLowerCase()}`}
+                onPress={() => {
+                  triggerTactileFeedback(soundEnabled, hapticsEnabled, 'medium');
+                  setDevSubDeck(tab.id);
+                }}
                 style={[
-                  styles.subDeckLabel,
+                  styles.subDeckTab,
                   {
-                    color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
-                    fontWeight: isActive ? '900' : '700',
+                    backgroundColor: isActive ? tokens.accentOps : tokens.keypadSurface,
+                    borderColor: tokens.borderVisible,
+                    borderWidth: 1.5,
+                    borderRadius: hardwareConstants.borderRadiusSm,
+                    borderBottomWidth: 2,
+                    transform: [{ translateY: isActive ? 1.5 : 0 }],
                   },
                 ]}
-                numberOfLines={1}
-                maxFontSizeMultiplier={1.2}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Icon size={12} color={isActive ? tokens.keycapOperatorText : tokens.keycapNumberText} strokeWidth={2.5} />
+                <Text
+                  style={[
+                    styles.subDeckLabel,
+                    {
+                      color: isActive ? tokens.keycapOperatorText : tokens.keycapNumberText,
+                      fontWeight: isActive ? '900' : '700',
+                    },
+                  ]}
+                  numberOfLines={1}
+                  maxFontSizeMultiplier={1.2}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Word Size & Word Config Rail */}
@@ -313,6 +321,11 @@ export const DevView: React.FC<DevViewProps> = ({ themeMode = 'field' }) => {
           </Pressable>
         </View>
       </View>
+
+      {/* SUB-DECK 0: DIRECT BINARY CALCULATION */}
+      {devSubDeck === 'BIN_CALC' && (
+        <DirectBinaryCalcView themeMode={themeMode} />
+      )}
 
       {/* SUB-DECK 1: MULTI-BASE CONVERTER & KEYPAD */}
       {devSubDeck === 'BASES' && (
@@ -973,19 +986,22 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 2,
   },
-  subDeckBar: {
-    flexDirection: 'row',
+  subDeckBarWrapper: {
     padding: 3,
-    gap: 3,
     marginBottom: 6,
   },
+  subDeckBar: {
+    flexDirection: 'row',
+    gap: 4,
+    alignItems: 'center',
+  },
   subDeckTab: {
-    flex: 1,
+    paddingHorizontal: 8,
     paddingVertical: 5,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: 3,
+    gap: 4,
   },
   subDeckLabel: {
     fontSize: 9,

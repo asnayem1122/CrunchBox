@@ -35,7 +35,7 @@ export interface PaperTapeEntry {
   isPinned?: boolean;
 }
 
-export type DevSubDeck = 'BASES' | 'ALU' | 'FLOAT' | 'TEXT' | 'DISCRETE';
+export type DevSubDeck = 'BIN_CALC' | 'BASES' | 'ALU' | 'FLOAT' | 'TEXT' | 'DISCRETE';
 
 export interface AppState {
   // Mode & System Appearance
@@ -84,6 +84,8 @@ export interface AppState {
   devWordSize: DevWordSize;
   devOperandA: string;
   devOperandB: string;
+  devOperandABase: DevBase;
+  devOperandBBase: DevBase;
   devActiveRegister: 'A' | 'B';
   devSubDeck: DevSubDeck;
   devFloatInput: string;
@@ -146,6 +148,10 @@ export interface AppState {
   setDevWordSize: (size: DevWordSize) => void;
   setDevOperandA: (val: string) => void;
   setDevOperandB: (val: string) => void;
+  setDevOperandABase: (base: DevBase) => void;
+  setDevOperandBBase: (base: DevBase) => void;
+  swapDevOperands: () => void;
+  loadDevResultToA: (resultStr: string) => void;
   setDevActiveRegister: (reg: 'A' | 'B') => void;
   setDevSubDeck: (deck: DevSubDeck) => void;
   setDevFloatInput: (val: string) => void;
@@ -161,26 +167,66 @@ export interface AppState {
   sendDevToCurrency: () => void;
 }
 
-// SSR-safe in-memory storage fallback for web exports & testing
+// SSR-safe in-memory storage with trailing 250ms debounced disk writes
 const memoryStorageMap = new Map<string, string>();
+const pendingDiskWrites = new Map<string, string>();
+let diskWriteTimer: ReturnType<typeof setTimeout> | null = null;
+
+export const flushPendingDiskWrites = async (): Promise<void> => {
+  if (diskWriteTimer) {
+    clearTimeout(diskWriteTimer);
+    diskWriteTimer = null;
+  }
+  const entries = Array.from(pendingDiskWrites.entries());
+  pendingDiskWrites.clear();
+  for (const [key, val] of entries) {
+    try {
+      await AsyncStorage.setItem(key, val);
+    } catch {
+      // Fallback silently
+    }
+  }
+};
+
 const ssrSafeStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
+    if (memoryStorageMap.has(name)) {
+      return memoryStorageMap.get(name)!;
+    }
     try {
       const val = await AsyncStorage.getItem(name);
-      return val ?? memoryStorageMap.get(name) ?? null;
+      if (val !== null) {
+        memoryStorageMap.set(name, val);
+      }
+      return val;
     } catch {
       return memoryStorageMap.get(name) || null;
     }
   },
-  setItem: async (name: string, value: string): Promise<void> => {
+  setItem: (name: string, value: string): void => {
+    // 1. Immediately store in memory (0ms synchronous RAM access)
     memoryStorageMap.set(name, value);
-    try {
-      await AsyncStorage.setItem(name, value);
-    } catch {
-      // Fallback silently
+    pendingDiskWrites.set(name, value);
+
+    // 2. Trailing 250ms debounce before flushing to disk
+    if (diskWriteTimer) {
+      clearTimeout(diskWriteTimer);
     }
+    diskWriteTimer = setTimeout(() => {
+      diskWriteTimer = null;
+      const val = pendingDiskWrites.get(name);
+      if (val !== undefined) {
+        pendingDiskWrites.delete(name);
+        AsyncStorage.setItem(name, val).catch(() => {});
+      }
+    }, 250);
   },
   removeItem: async (name: string): Promise<void> => {
+    if (diskWriteTimer) {
+      clearTimeout(diskWriteTimer);
+      diskWriteTimer = null;
+    }
+    pendingDiskWrites.delete(name);
     memoryStorageMap.delete(name);
     try {
       await AsyncStorage.removeItem(name);
@@ -242,10 +288,12 @@ export const useAppStore = create<AppState>()(
       // DEV Mode Defaults (Strings for state safety)
       devBase: 'HEX',
       devWordSize: 32,
-      devOperandA: '0',
-      devOperandB: '0',
+      devOperandA: '172',
+      devOperandB: '15',
+      devOperandABase: 'BIN',
+      devOperandBBase: 'DEC',
       devActiveRegister: 'A',
-      devSubDeck: 'BASES',
+      devSubDeck: 'BIN_CALC',
       devFloatInput: '-12.375',
       devTextInput: 'Crunch',
       devIsSigned: false,
@@ -614,6 +662,24 @@ export const useAppStore = create<AppState>()(
 
       setDevOperandB: (val) => set({ devOperandB: val }),
 
+      setDevOperandABase: (base) => set({ devOperandABase: base, devBase: base }),
+
+      setDevOperandBBase: (base) => set({ devOperandBBase: base, devBase: base }),
+
+      swapDevOperands: () =>
+        set((state) => ({
+          devOperandA: state.devOperandB,
+          devOperandB: state.devOperandA,
+          devOperandABase: state.devOperandBBase,
+          devOperandBBase: state.devOperandABase,
+        })),
+
+      loadDevResultToA: (resultStr) => {
+        const mask = getWordMask(get().devWordSize);
+        const parsed = parseToBigInt(resultStr, 'DEC') & mask;
+        set({ devOperandA: parsed.toString(10), devActiveRegister: 'A' });
+      },
+
       setDevActiveRegister: (reg) => set({ devActiveRegister: reg }),
 
       setDevSubDeck: (deck) => set({ devSubDeck: deck }),
@@ -741,6 +807,8 @@ export const useAppStore = create<AppState>()(
         devWordSize: state.devWordSize,
         devOperandA: state.devOperandA,
         devOperandB: state.devOperandB,
+        devOperandABase: state.devOperandABase,
+        devOperandBBase: state.devOperandBBase,
         devFloatInput: state.devFloatInput,
         devTextInput: state.devTextInput,
         devIsSigned: state.devIsSigned,

@@ -1,4 +1,4 @@
-export type DevBase = 'HEX' | 'DEC' | 'OCT' | 'BIN';
+export type DevBase = 'HEX' | 'DEC' | 'OCT' | 'BIN' | 'ASCII';
 export type DevWordSize = 8 | 16 | 32 | 64;
 
 export type BitwiseOp =
@@ -11,11 +11,15 @@ export type BitwiseOp =
   | 'XNOR'
   | 'SHL'
   | 'SHR'
+  | 'SAR'
   | 'ROR'
   | 'ROL'
   | 'ENDIAN_SWAP'
   | 'ADD'
-  | 'SUB';
+  | 'SUB'
+  | 'MUL'
+  | 'DIV'
+  | 'MOD';
 
 export interface AluFlags {
   zf: boolean;
@@ -27,6 +31,7 @@ export interface AluFlags {
 export interface AluResult {
   resultStr: string;
   flags: AluFlags;
+  error?: 'DIV_BY_ZERO' | null;
 }
 
 export interface Ieee754FloatAnalysis {
@@ -87,6 +92,10 @@ export function parseToBigInt(valStr: string, base: DevBase = 'DEC'): bigint {
  */
 export function isValidDigitForBase(char: string, base: DevBase): boolean {
   if (char === '') return false;
+  if (base === 'ASCII') {
+    const code = char.charCodeAt(0);
+    return code >= 0 && code <= 127;
+  }
   const upper = char.toUpperCase();
   if (base === 'BIN') return upper === '0' || upper === '1';
   if (base === 'OCT') return /^[0-7]$/.test(upper);
@@ -109,6 +118,10 @@ export function formatBigIntBase(
 ): string {
   const mask = getWordMask(wordSize);
   const maskedVal = val & mask;
+
+  if (base === 'ASCII') {
+    return formatCharRepresentation(maskedVal);
+  }
 
   if (base === 'BIN') {
     let binStr = maskedVal.toString(2).padStart(wordSize, '0');
@@ -282,6 +295,63 @@ export function computeAluOperation(
       of = signA !== signB && signRes !== signA; // Signed overflow
       break;
     }
+    case 'MUL': {
+      const prod = a * b;
+      rawResult = prod & mask;
+      cf = prod > mask;
+      const signA = (a & msbWeight) !== 0n;
+      const signB = (b & msbWeight) !== 0n;
+      const signedA = signA ? a - (1n << BigInt(wordSize)) : a;
+      const signedB = signB ? b - (1n << BigInt(wordSize)) : b;
+      const signedProd = signedA * signedB;
+      const minSigned = -(1n << BigInt(wordSize - 1));
+      const maxSigned = (1n << BigInt(wordSize - 1)) - 1n;
+      of = signedProd < minSigned || signedProd > maxSigned;
+      break;
+    }
+    case 'DIV': {
+      if (b === 0n) {
+        return {
+          resultStr: '0',
+          flags: { zf: true, sf: false, cf: null, of: null },
+          error: 'DIV_BY_ZERO',
+        };
+      }
+      rawResult = (a / b) & mask;
+      cf = null;
+      of = null;
+      break;
+    }
+    case 'MOD': {
+      if (b === 0n) {
+        return {
+          resultStr: '0',
+          flags: { zf: true, sf: false, cf: null, of: null },
+          error: 'DIV_BY_ZERO',
+        };
+      }
+      rawResult = (a % b) & mask;
+      cf = null;
+      of = null;
+      break;
+    }
+    case 'SAR': {
+      const shift = Number(b % BigInt(wordSize));
+      const isNegative = (a & msbWeight) !== 0n;
+      if (shift === 0) {
+        rawResult = a;
+        cf = false;
+      } else {
+        cf = Boolean((a >> BigInt(shift - 1)) & 1n);
+        let shifted = a >> BigInt(shift);
+        if (isNegative) {
+          const signFill = (mask >> BigInt(wordSize - shift)) << BigInt(wordSize - shift);
+          shifted |= signFill;
+        }
+        rawResult = shifted & mask;
+      }
+      break;
+    }
   }
 
   const finalResult = rawResult & mask;
@@ -291,6 +361,7 @@ export function computeAluOperation(
   return {
     resultStr: finalResult.toString(10),
     flags: { zf, sf, cf, of },
+    error: null,
   };
 }
 
@@ -474,4 +545,21 @@ export function isPowerOfTwoBigInt(n: bigint): boolean {
 export function powerOfTwoBigInt(exp: number): bigint {
   if (exp < 0 || exp > 64) return 0n;
   return 1n << BigInt(exp);
+}
+
+/**
+ * Returns a printable ASCII / Unicode character representation for a byte/word value.
+ */
+export function formatCharRepresentation(val: bigint): string {
+  if (val > 127n || val < 0n) return '';
+  const code = Number(val);
+  if (code >= 32 && code <= 126) {
+    return "'" + String.fromCharCode(code) + "'";
+  }
+  if (code === 0) return '\\0 (NUL)';
+  if (code === 9) return '\\t (TAB)';
+  if (code === 10) return '\\n (LF)';
+  if (code === 13) return '\\r (CR)';
+  if (code === 27) return 'ESC';
+  return '0x' + code.toString(16).toUpperCase().padStart(2, '0');
 }

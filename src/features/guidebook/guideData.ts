@@ -103,16 +103,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     summaryEn: 'Built for CSE students and embedded engineers: 64-bit multi-base conversions, interactive bit grid, IEEE-754 single-precision float analysis, and UTF-8 codec.',
     summaryBn: 'সিএসই শিক্ষার্থী ও সফটওয়্যার ইঞ্জিনিয়ারদের জন্য: ৬৪-বিট মাল্টি-বেস রূপান্তর, ইন্টারেক্টিভ বিট গ্রিড, IEEE-754 ফ্লোট বিশ্লেষণ এবং UTF-8 কোডেক।',
     tipsEn: [
-      'Tap any bit in the Interactive Bit Grid to toggle it live and observe Hex/Dec/Bin synchronizing.',
-      'Tap SIGNED (2s) to inspect 2s-complement signed integers for 8, 16, 32, or 64-bit words.',
-      'Sub-decks: BASES (radix), ALU (logic ops + flags), FLOAT (IEEE-754), TEXT (ASCII/UTF-8), DISCRETE (GCD/LCM/primes).',
+      'BIN CALC (Direct Binary Calculator) lets you set Operand A and B independently to any radix (BIN, DEC, HEX, OCT, ASCII) with live bit-level truth table.',
+      'Tap any bit in the Interactive Bit Truth Table to toggle it live and observe Hex/Dec/Bin synchronizing instantly.',
+      'Tap SIGNED (2s) to inspect 2s-complement signed integers for 8, 16, 32, or 64-bit words with Carry & Overflow flags.',
+      'Sub-decks: BIN CALC (binary arithmetic & truth table), BASES (radix), ALU (logic ops + flags), FLOAT (IEEE-754), TEXT (ASCII/UTF-8), DISCRETE (GCD/LCM/primes).',
     ],
     tipsBn: [
-      'ইন্টারেক্টিভ বিট গ্রিডের যেকোনো বিটে ট্যাপ করে সরাসরি ০/১ পরিবর্তন করুন এবং হেক্স/ডেসিমাল মান দেখুন।',
-      'SIGNED (2s) এ চাপ দিয়ে ২-এর পরিপূরক (Two\'s Complement) সাইনড মান পরীক্ষা করুন।',
-      'সাব-ডেকসমূহ: BASES (বেস রূপান্তর), ALU (লজিক ও ফ্ল্যাগ), FLOAT (ফ্লোট ডিকম্পোজিশন), TEXT (ইউনিকোড), DISCRETE (গসাগু/লসাগু)।',
+      'দ্বিমিক হিসাব (BIN CALC) এর মাধ্যমে অপারেন্ড A এবং B-কে আলাদাভাবে যেকোনো সংখ্যা পদ্ধতিতে (BIN, DEC, HEX, OCT, ASCII) নির্ধারণ করে সরাসরি হিসাব ও বিট ট্রুথ টেবিল দেখা যায়।',
+      'ইন্টারেক্টিভ বিট ট্রুথ টেবিলের যেকোনো বিটে ট্যাপ করে সরাসরি ০/১ পরিবর্তন করুন এবং হেক্স/ডেসিমাল মান দেখুন।',
+      'SIGNED (2s) এ চাপ দিয়ে ২-এর পরিপূরক (Two\'s Complement) সাইনড মান এবং ক্যারি/ওভারফ্লো ফ্ল্যাগ পরীক্ষা করুন।',
+      'সাব-ডেকসমূহ: BIN CALC (দ্বিমিক হিসাব ও ট্রুথ টেবিল), BASES (বেস রূপান্তর), ALU (লজিক ও ফ্ল্যাগ), FLOAT (ফ্লোট ডিকম্পোজিশন), TEXT (ইউনিকোড), DISCRETE (গসাগু/লসাগু)।',
     ],
     examples: [
+      {
+        titleEn: 'Direct Binary Math (0b1010 + 0b0101)',
+        titleBn: 'দ্বিমিক হিসাব (0b1010 + 0b0101)',
+        expression: '1010 + 0101',
+        mode: 'DEV',
+        explanationEn: 'Binary addition yielding 0b1111 (15 DEC / 0xF HEX) with 0-shift bit truth table',
+        explanationBn: 'বাইনারি যোগের ফলাফল 0b1111 (১৫ DEC / 0xF HEX)',
+      },
       {
         titleEn: 'Inspect Byte 255 (0xFF)',
         titleBn: 'বাইট ২৫৫ (0xFF) পরীক্ষা',

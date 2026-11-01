@@ -109,6 +109,7 @@ export type HapticFeedbackTier = 'light' | 'medium' | 'heavy' | 'warning';
 
 /**
  * Triggers native haptic impact or notification feedback on iOS/Android.
+ * Strictly non-blocking and fire-and-forget.
  */
 export async function triggerHaptic(
   hapticsEnabled: boolean = true,
@@ -134,14 +135,25 @@ export async function triggerHaptic(
   }
 }
 
+// 25ms throttle timestamp to prevent auditory and haptic stutter during fast bursts
+let lastFeedbackTimestamp = 0;
+
 /**
  * Unified feedback trigger combining mechanical sound and haptic pulse.
+ * Throttled to at most once per 25ms.
  */
 export function triggerTactileFeedback(
   soundEnabled: boolean = true,
   hapticsEnabled: boolean = true,
   tier: HapticFeedbackTier = 'light'
 ): void {
+  const now = Date.now();
+  if (now - lastFeedbackTimestamp < 25) {
+    return;
+  }
+  lastFeedbackTimestamp = now;
+
   playMechanicalClick(soundEnabled);
-  triggerHaptic(hapticsEnabled, tier);
+  // Fire-and-forget: catch any error silently
+  triggerHaptic(hapticsEnabled, tier).catch(() => {});
 }

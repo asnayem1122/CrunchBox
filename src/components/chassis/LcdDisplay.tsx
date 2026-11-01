@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -60,7 +60,7 @@ export function getDynamicLcdFontSize(charCount: number): number {
   return 15;
 }
 
-export const LcdDisplay: React.FC<LcdDisplayProps> = ({
+const LcdDisplayComponent: React.FC<LcdDisplayProps> = ({
   expression,
   value,
   liveAnswer,
@@ -94,6 +94,13 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
   const effectiveReadout = primeFactorsDisplay || fractionDisplay || displayValue;
   const fontSize = getDynamicLcdFontSize(effectiveReadout.length);
 
+  const exprScrollRef = useRef<ScrollView>(null);
+  useEffect(() => {
+    if (expression) {
+      exprScrollRef.current?.scrollToEnd({ animated: false });
+    }
+  }, [expression]);
+
   const handleAngleToggle = () => {
     triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
     onToggleAngleMode?.();
@@ -117,11 +124,16 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
   const backlightLabel =
     backlightMode === 'amber' ? 'AMBR' : backlightMode === 'stealth' ? 'NVG' : 'SAGE';
 
+  const hasBottomBar = Boolean(aluFlags || hexValue !== undefined);
+  const screenHeight = hasBottomBar ? 142 : 118;
+  const bezelHeight = screenHeight + 8;
+
   return (
     <View
       style={[
         styles.visorBezel,
         {
+          height: bezelHeight,
           backgroundColor: tokens.inkBorder,
           borderRadius: hardwareConstants.borderRadiusLg,
           padding: 4,
@@ -129,11 +141,12 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
         style,
       ]}
     >
-      {/* Recessed LCD Screen Body */}
+      {/* Recessed LCD Screen Body - STRICT FIXED HEIGHT (zero layout reflow) */}
       <View
         style={[
           styles.screenSurface,
           {
+            height: screenHeight,
             backgroundColor: lcdColors.surface,
             borderColor: tokens.borderVisible,
             borderWidth: hardwareConstants.borderWidth,
@@ -200,11 +213,11 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               </Pressable>
             ) : null}
 
-            {/* Backlight Preset Button */}
+            {/* Backlight Annunciator Pill */}
             {onToggleBacklight ? (
               <Pressable
                 accessible={true}
-                accessibilityLabel={`Backlight: ${backlightLabel}`}
+                accessibilityLabel={`LCD backlight: ${backlightMode}`}
                 testID="lcd-backlight-toggle"
                 onPress={handleBacklightToggle}
                 style={[
@@ -221,11 +234,11 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               </Pressable>
             ) : null}
 
-            {/* Grouping Indicator BD / INTL */}
+            {/* Digit Grouping (BD vs INTL) Pill */}
             {onToggleDigitGrouping ? (
               <Pressable
                 accessible={true}
-                accessibilityLabel={`Grouping: ${digitGroupingMode}`}
+                accessibilityLabel={`Digit grouping: ${digitGroupingMode}`}
                 testID="lcd-grouping-toggle"
                 onPress={handleGroupingToggle}
                 style={[
@@ -242,7 +255,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               </Pressable>
             ) : null}
 
-            {/* Rate Freshness */}
+            {/* Live Exchange Rate Freshness Indicator */}
             {rateFreshness ? (
               <View
                 style={[
@@ -287,6 +300,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
             ) : null}
 
             <ScrollView
+              ref={exprScrollRef}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.expressionScroll}
@@ -328,14 +342,21 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
           </ScrollView>
         </View>
 
-        {/* 0ms Speculative Live Auto-Compute Line */}
-        {liveAnswer && !error ? (
-          <View style={styles.liveAnswerRow}>
-            <Text style={[styles.liveAnswerText, { color: lcdColors.text }]}>
-              ans ≈ {liveAnswer}
-            </Text>
-          </View>
-        ) : null}
+        {/* 0ms Speculative Live Auto-Compute Line with Dedicated Fixed Slot */}
+        <View style={styles.liveAnswerRow}>
+          <Text
+            style={[
+              styles.liveAnswerText,
+              {
+                color: lcdColors.text,
+                opacity: liveAnswer && !error ? 0.75 : 0,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            {liveAnswer && !error ? `ans ≈ ${liveAnswer}` : ' '}
+          </Text>
+        </View>
 
         {/* ALU Flags Bar (If DEV Mode) OR Programmer Base Strip */}
         {aluFlags ? (
@@ -373,7 +394,7 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               </Text>
             </View>
           </View>
-        ) : (
+        ) : hexValue !== undefined ? (
           <View
             style={[
               styles.baseBar,
@@ -408,11 +429,37 @@ export const LcdDisplay: React.FC<LcdDisplayProps> = ({
               {octValue || '0'}
             </Text>
           </View>
-        )}
+        ) : null}
       </View>
     </View>
   );
 };
+
+export const LcdDisplay = memo(LcdDisplayComponent, (prev, next) => {
+  return (
+    prev.expression === next.expression &&
+    prev.value === next.value &&
+    prev.liveAnswer === next.liveAnswer &&
+    prev.fractionMode === next.fractionMode &&
+    prev.fractionDisplay === next.fractionDisplay &&
+    prev.primeFactorsDisplay === next.primeFactorsDisplay &&
+    prev.mode === next.mode &&
+    prev.angleMode === next.angleMode &&
+    prev.memoryActive === next.memoryActive &&
+    prev.hexValue === next.hexValue &&
+    prev.binValue === next.binValue &&
+    prev.octValue === next.octValue &&
+    prev.themeMode === next.themeMode &&
+    prev.backlightMode === next.backlightMode &&
+    prev.digitGroupingMode === next.digitGroupingMode &&
+    prev.rateFreshness === next.rateFreshness &&
+    prev.error === next.error &&
+    prev.aluFlags === next.aluFlags &&
+    prev.soundEnabled === next.soundEnabled &&
+    prev.hapticsEnabled === next.hapticsEnabled &&
+    prev.style === next.style
+  );
+});
 
 const styles = StyleSheet.create({
   visorBezel: {
@@ -426,6 +473,7 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     paddingBottom: 4,
     overflow: 'hidden',
+    justifyContent: 'space-between',
   },
   topStatusStrip: {
     flexDirection: 'row',
@@ -535,6 +583,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   liveAnswerRow: {
+    height: 18,
+    justifyContent: 'center',
     alignItems: 'flex-end',
     paddingVertical: 1,
   },
@@ -542,7 +592,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'monospace',
     fontWeight: '700',
-    opacity: 0.75,
     letterSpacing: 0.5,
   },
   baseBar: {
