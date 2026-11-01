@@ -44,7 +44,7 @@ describe('Binary Calculation & Extended ALU Engine', () => {
       expect(res3.flags.of).toBe(true);
     });
 
-    it('executes 8-bit DIV correctly and handles division by zero cleanly', () => {
+    it('executes 8-bit DIV correctly and handles division by zero cleanly with ZF=false', () => {
       // 50 / 5 = 10
       const res1 = computeAluOperation('50', '5', 'DIV', 8);
       expect(res1.resultStr).toBe('10');
@@ -55,11 +55,12 @@ describe('Binary Calculation & Extended ALU Engine', () => {
       const resDivZero = computeAluOperation('50', '0', 'DIV', 8);
       expect(resDivZero.error).toBe('DIV_BY_ZERO');
       expect(resDivZero.resultStr).toBe('0');
+      expect(resDivZero.flags.zf).toBe(false);
       expect(resDivZero.flags.cf).toBeNull();
       expect(resDivZero.flags.of).toBeNull();
     });
 
-    it('executes MOD and handles modulo by zero cleanly', () => {
+    it('executes MOD and handles modulo by zero cleanly with ZF=false', () => {
       // 25 % 7 = 4
       const res1 = computeAluOperation('25', '7', 'MOD', 8);
       expect(res1.resultStr).toBe('4');
@@ -69,6 +70,9 @@ describe('Binary Calculation & Extended ALU Engine', () => {
       const resModZero = computeAluOperation('25', '0', 'MOD', 8);
       expect(resModZero.error).toBe('DIV_BY_ZERO');
       expect(resModZero.resultStr).toBe('0');
+      expect(resModZero.flags.zf).toBe(false);
+      expect(resModZero.flags.cf).toBeNull();
+      expect(resModZero.flags.of).toBeNull();
     });
 
     it('executes SAR (Arithmetic Shift Right) preserving sign bit', () => {
@@ -123,17 +127,20 @@ describe('Binary Calculation & Extended ALU Engine', () => {
   });
 
   describe('Multi-Base Operand State and Store Actions', () => {
-    it('allows independent base selection for Operand A and B', () => {
+    it('allows independent base selection for Operand A and B without mutating decimal state', () => {
+      useAppStore.setState({ devOperandA: '15' });
       const store = useAppStore.getState();
-      expect(store.devOperandABase).toBe('BIN');
-      expect(store.devOperandBBase).toBe('DEC');
 
       store.setDevOperandABase('HEX');
-      store.setDevOperandBBase('OCT');
+      expect(useAppStore.getState().devOperandA).toBe('15'); // Remains canonical 15
+      expect(formatBigIntBase(15n, 'HEX', 8)).toBe('0x 0F');
 
-      const updated = useAppStore.getState();
-      expect(updated.devOperandABase).toBe('HEX');
-      expect(updated.devOperandBBase).toBe('OCT');
+      store.setDevOperandABase('BIN');
+      expect(useAppStore.getState().devOperandA).toBe('15');
+      expect(formatBigIntBase(15n, 'BIN', 8)).toBe('0000 1111');
+
+      store.setDevOperandABase('OCT');
+      expect(formatBigIntBase(15n, 'OCT', 8)).toBe('0o17');
     });
 
     it('swaps operands cleanly preserving decimal state and bases', () => {
@@ -192,6 +199,23 @@ describe('Binary Calculation & Extended ALU Engine', () => {
       expect(res.flags.of).toBe(true); // Signed overflow into negative
       expect(res.flags.sf).toBe(true);
       expect(res.flags.cf).toBe(false);
+    });
+
+    it('supports Guidebook Try It Now presets for BIN CALC', () => {
+      // 1. 0b1010 + 0b0101
+      const resAdd = computeAluOperation('10', '5', 'ADD', 8);
+      expect(resAdd.resultStr).toBe('15');
+      expect(formatBigIntBase(15n, 'BIN', 8)).toBe('0000 1111');
+
+      // 2. 0xAA ^ 0x55
+      const resXor = computeAluOperation('170', '85', 'XOR', 8);
+      expect(resXor.resultStr).toBe('255');
+      expect(formatBigIntBase(255n, 'HEX', 8)).toBe('0x FF');
+
+      // 3. 0b1100 << 2
+      const resShl = computeAluOperation('12', '2', 'SHL', 8);
+      expect(resShl.resultStr).toBe('48');
+      expect(formatBigIntBase(48n, 'BIN', 8)).toBe('0011 0000');
     });
   });
 });

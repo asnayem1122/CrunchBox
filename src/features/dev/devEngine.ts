@@ -313,7 +313,7 @@ export function computeAluOperation(
       if (b === 0n) {
         return {
           resultStr: '0',
-          flags: { zf: true, sf: false, cf: null, of: null },
+          flags: { zf: false, sf: false, cf: null, of: null },
           error: 'DIV_BY_ZERO',
         };
       }
@@ -326,7 +326,7 @@ export function computeAluOperation(
       if (b === 0n) {
         return {
           resultStr: '0',
-          flags: { zf: true, sf: false, cf: null, of: null },
+          flags: { zf: false, sf: false, cf: null, of: null },
           error: 'DIV_BY_ZERO',
         };
       }

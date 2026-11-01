@@ -118,10 +118,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         titleEn: 'Direct Binary Math (0b1010 + 0b0101)',
         titleBn: 'দ্বিমিক হিসাব (0b1010 + 0b0101)',
-        expression: '1010 + 0101',
+        expression: '0b1010 + 0b0101',
         mode: 'DEV',
         explanationEn: 'Binary addition yielding 0b1111 (15 DEC / 0xF HEX) with 0-shift bit truth table',
         explanationBn: 'বাইনারি যোগের ফলাফল 0b1111 (১৫ DEC / 0xF HEX)',
+      },
+      {
+        titleEn: 'Bitwise XOR (0xAA ^ 0x55)',
+        titleBn: 'বিটওয়াইজ XOR (0xAA ^ 0x55)',
+        expression: '0xAA ^ 0x55',
+        mode: 'DEV',
+        explanationEn: 'Alternating bitwise XOR yielding 0xFF (255 DEC / 0b11111111)',
+        explanationBn: 'বিটওয়াইজ XOR ফলাফল 0xFF (২৫৫ DEC / 0b11111111)',
+      },
+      {
+        titleEn: 'Arithmetic Shift Left (0b1100 << 2)',
+        titleBn: 'অ্যারিথমেটিক শিফট লেফট (0b1100 << 2)',
+        expression: '0b1100 << 2',
+        mode: 'DEV',
+        explanationEn: 'Shift 0b1100 (12) left by 2 positions yielding 0b110000 (48 DEC)',
+        explanationBn: '০b১১০০ (১২) কে ২ ঘর বামে শিফট করলে ফলাফল ০b১১০০০০ (৪৮ DEC)',
       },
       {
         titleEn: 'Inspect Byte 255 (0xFF)',

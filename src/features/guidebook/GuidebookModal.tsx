@@ -83,10 +83,49 @@ export const GuidebookModal: React.FC<GuidebookModalProps> = ({
       }
       setMode(example.mode);
     } else if (example.mode === 'DEV') {
-      if (example.expression) {
-        setDevOperandA(example.expression);
+      const expr = example.expression || '';
+      if (expr === '0b1010 + 0b0101') {
+        useAppStore.setState({
+          devOperandA: '10',
+          devOperandB: '5',
+          devOperandABase: 'BIN',
+          devOperandBBase: 'BIN',
+          devAluOp: 'ADD',
+          devWordSize: 8,
+          devSubDeck: 'BIN_CALC',
+          devActiveRegister: 'A',
+          activeMode: 'DEV',
+        });
+      } else if (expr === '0xAA ^ 0x55') {
+        useAppStore.setState({
+          devOperandA: '170',
+          devOperandB: '85',
+          devOperandABase: 'HEX',
+          devOperandBBase: 'HEX',
+          devAluOp: 'XOR',
+          devWordSize: 8,
+          devSubDeck: 'BIN_CALC',
+          devActiveRegister: 'A',
+          activeMode: 'DEV',
+        });
+      } else if (expr === '0b1100 << 2') {
+        useAppStore.setState({
+          devOperandA: '12',
+          devOperandB: '2',
+          devOperandABase: 'BIN',
+          devOperandBBase: 'DEC',
+          devAluOp: 'SHL',
+          devWordSize: 8,
+          devSubDeck: 'BIN_CALC',
+          devActiveRegister: 'A',
+          activeMode: 'DEV',
+        });
+      } else {
+        if (example.expression) {
+          setDevOperandA(example.expression);
+        }
+        setMode('DEV');
       }
-      setMode('DEV');
     } else if (example.mode === 'CURR') {
       setCurrencyAmount('100');
       setMode('CURR');

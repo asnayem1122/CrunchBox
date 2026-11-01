@@ -2,6 +2,7 @@ import React, { useMemo, memo } from 'react';
 import {
   View,
   Text,
+  TextInput,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +22,7 @@ import {
   computeAluOperation,
   formatCharRepresentation,
   getBit,
+  toggleBit,
   getWordMask,
 } from './devEngine';
 import {
@@ -35,6 +37,29 @@ export interface DirectBinaryCalcViewProps {
 }
 
 const BASES: DevBase[] = ['BIN', 'DEC', 'HEX', 'OCT', 'ASCII'];
+
+const ASCII_PRESETS: Array<{ label: string; code: number }> = [
+  { label: "'A'", code: 65 },
+  { label: "'B'", code: 66 },
+  { label: "'C'", code: 67 },
+  { label: "'a'", code: 97 },
+  { label: "'b'", code: 98 },
+  { label: "'0'", code: 48 },
+  { label: "'1'", code: 49 },
+  { label: "'9'", code: 57 },
+  { label: "'!'", code: 33 },
+  { label: "'@'", code: 64 },
+  { label: "'#'", code: 35 },
+  { label: "'$'", code: 36 },
+  { label: "'%'", code: 37 },
+  { label: "'*'", code: 42 },
+  { label: "'='", code: 61 },
+  { label: "'?'", code: 63 },
+  { label: "'~'", code: 126 },
+  { label: 'SPC', code: 32 },
+  { label: '\\n', code: 10 },
+  { label: '\\0', code: 0 },
+];
 
 // Memoized Bit Cell to ensure 60fps performance during rapid bit flipping
 interface BitCellProps {
@@ -175,9 +200,35 @@ export const DirectBinaryCalcView: React.FC<DirectBinaryCalcViewProps> = ({ them
     });
   };
 
-  const handleBitToggle = (bitIdx: number) => {
+  const activeChar = useMemo(() => {
+    const val = devActiveRegister === 'A' ? bigA : bigB;
+    const code = Number(val & 0x7Fn);
+    if (code >= 32 && code <= 126) {
+      return String.fromCharCode(code);
+    }
+    return '';
+  }, [devActiveRegister, bigA, bigB]);
+
+  const handleSetAsciiCode = (code: number) => {
     triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
-    toggleDevBit(bitIdx);
+    const clamped = BigInt(code & 0x7F).toString(10);
+    if (devActiveRegister === 'A') {
+      useAppStore.setState({ devOperandA: clamped });
+    } else {
+      useAppStore.setState({ devOperandB: clamped });
+    }
+  };
+
+  const handleBitToggleA = (bitIdx: number) => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
+    const nextVal = toggleBit(devOperandA, bitIdx, devWordSize);
+    useAppStore.setState({ devOperandA: nextVal, devActiveRegister: 'A' });
+  };
+
+  const handleBitToggleB = (bitIdx: number) => {
+    triggerTactileFeedback(soundEnabled, hapticsEnabled, 'light');
+    const nextVal = toggleBit(devOperandB, bitIdx, devWordSize);
+    useAppStore.setState({ devOperandB: nextVal, devActiveRegister: 'B' });
   };
 
   const handleKeycapPress = (char: string) => {
@@ -570,8 +621,8 @@ export const DirectBinaryCalcView: React.FC<DirectBinaryCalcViewProps> = ({ them
                     <BitCell
                       bit={bit}
                       index={bitIdx}
-                      isInteractive={devActiveRegister === 'A'}
-                      onToggle={handleBitToggle}
+                      isInteractive={true}
+                      onToggle={handleBitToggleA}
                       accentColor={tokens.accentOps}
                       inactiveBg={tokens.keypadSurface}
                       textColor={bit === 1 ? tokens.keycapOperatorText : tokens.keycapNumberText}
@@ -615,8 +666,8 @@ export const DirectBinaryCalcView: React.FC<DirectBinaryCalcViewProps> = ({ them
                     <BitCell
                       bit={bit}
                       index={bitIdx}
-                      isInteractive={devActiveRegister === 'B'}
-                      onToggle={handleBitToggle}
+                      isInteractive={true}
+                      onToggle={handleBitToggleB}
                       accentColor={tokens.accentOps}
                       inactiveBg={tokens.keypadSurface}
                       textColor={bit === 1 ? tokens.keycapOperatorText : tokens.keycapNumberText}
@@ -805,6 +856,90 @@ export const DirectBinaryCalcView: React.FC<DirectBinaryCalcViewProps> = ({ them
           </View>
         </View>
 
+        {/* Dedicated ASCII Character Picker & Direct Keyboard Input */}
+        {activeBase === 'ASCII' && (
+          <View
+            style={[
+              styles.asciiInputCard,
+              {
+                backgroundColor: tokens.innerPanel,
+                borderColor: tokens.borderVisible,
+              },
+            ]}
+          >
+            <View style={styles.asciiInputHeader}>
+              <Text style={[styles.asciiInputTitle, { color: tokens.textSecondary }]}>
+                ASCII CHAR INPUT (0..127):
+              </Text>
+              <Text style={[styles.asciiCodeReadout, { color: tokens.actionGreen }]}>
+                {activeChar ? `'${activeChar}' (CODE: ${activeChar.charCodeAt(0)})` : 'CODE: 0 (NUL)'}
+              </Text>
+            </View>
+
+            <View style={styles.asciiDirectInputRow}>
+              <TextInput
+                accessible={true}
+                accessibilityLabel="Direct ASCII Character Input"
+                style={[
+                  styles.asciiTextInput,
+                  {
+                    color: tokens.textPrimary,
+                    backgroundColor: tokens.keypadSurface,
+                    borderColor: tokens.borderVisible,
+                  },
+                ]}
+                maxLength={1}
+                autoCapitalize="none"
+                placeholder="Type char..."
+                placeholderTextColor={tokens.textMuted}
+                value={activeChar}
+                onChangeText={(text) => {
+                  if (text.length > 0) {
+                    handleSetAsciiCode(text.charCodeAt(0));
+                  } else {
+                    handleSetAsciiCode(0);
+                  }
+                }}
+              />
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.asciiPresetsScroll}
+              >
+                {ASCII_PRESETS.map((p) => {
+                  const currentVal = devActiveRegister === 'A' ? bigA : bigB;
+                  const isCur = currentVal === BigInt(p.code);
+                  return (
+                    <Pressable
+                      key={p.label}
+                      accessible={true}
+                      accessibilityLabel={`Set ASCII to ${p.label}`}
+                      onPress={() => handleSetAsciiCode(p.code)}
+                      style={[
+                        styles.asciiPresetChip,
+                        {
+                          backgroundColor: isCur ? tokens.accentOps : tokens.keypadSurface,
+                          borderColor: tokens.borderVisible,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.asciiPresetText,
+                          { color: isCur ? tokens.keycapOperatorText : tokens.keycapNumberText },
+                        ]}
+                      >
+                        {p.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          </View>
+        )}
+
         {/* Tactile Keypad Matrix */}
         <View style={styles.keypadMatrix}>
           {/* Hex Row: A..D */}
@@ -933,13 +1068,14 @@ const KeycapCell = memo(({ label, enabled, flex = 1, variant = 'number', onPress
       accessibilityLabel={`Key ${label}`}
       disabled={!enabled}
       onPress={onPress}
-      style={[
+      style={({ pressed }) => [
         styles.keycapBox,
         {
           flex,
           backgroundColor: bg,
           borderColor: tokens.borderVisible,
           opacity: enabled ? 1 : 0.28,
+          transform: [{ translateY: pressed && enabled ? 2 : 0 }],
         },
       ]}
     >
@@ -1185,7 +1321,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   bitColHeader: {
-    width: 26,
+    width: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1197,8 +1333,8 @@ const styles = StyleSheet.create({
     padding: 1,
   },
   bitCellBox: {
-    width: 24,
-    height: 22,
+    width: 30,
+    height: 26,
     borderWidth: 1,
     borderRadius: 3,
     alignItems: 'center',
@@ -1210,10 +1346,10 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   nibbleSeparator: {
-    width: 5,
+    width: 8,
   },
   opSymbolSlot: {
-    width: 26,
+    width: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1267,6 +1403,58 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 2,
+  },
+  asciiInputCard: {
+    padding: 6,
+    borderRadius: hardwareConstants.borderRadiusSm,
+    borderWidth: 1.5,
+    marginBottom: 6,
+  },
+  asciiInputHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  asciiInputTitle: {
+    fontSize: 9.5,
+    fontFamily: 'monospace',
+    fontWeight: '800',
+  },
+  asciiCodeReadout: {
+    fontSize: 9.5,
+    fontFamily: 'monospace',
+    fontWeight: '900',
+  },
+  asciiDirectInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  asciiTextInput: {
+    width: 50,
+    height: 32,
+    borderWidth: 1.5,
+    borderRadius: 4,
+    textAlign: 'center',
+    fontFamily: 'monospace',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  asciiPresetsScroll: {
+    flex: 1,
+  },
+  asciiPresetChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 3,
+    borderWidth: 1,
+    marginRight: 4,
+  },
+  asciiPresetText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    fontWeight: '800',
   },
   keypadTargetLabel: {
     fontSize: 10,
