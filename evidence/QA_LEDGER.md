@@ -68,3 +68,28 @@
 | **QA-110-07** | In-App QA Analyzer | Real-time telemetry + 15-point automated self-test runner with formatted ASCII report export | ✅ PASS | `evidence/v1.1.0/qa_analyzer_15_pass.png` & `src/features/diagnostics/HardwareDiagnosticsModal.tsx` |
 | **QA-110-08** | In-Place Upgrade Install | `v1.1.0` (`versionCode: 2`) compiled with existing release keystore installs over `v1.0.0` with `adb install -r` | ✅ PASS | Signed standalone release APK verified on `LGN_LX2` |
 | **QA-110-09** | Full Test Suite | 154 unit tests passing (100% pass rate) across 12 test suites | ✅ PASS | 154/154 Jest tests green |
+
+---
+
+## 6. v1.1.0 Final Release Packaging & Direct Binary Calculation Ledger
+
+### 6.1 Final Quality Gates & Test Suite Summary
+- **Total Jest Test Suites:** 15/15 passed (100% green)
+- **Total Passing Unit Tests:** 182/182 passed
+- **TypeScript Static Analysis:** `tsc --noEmit` passed with 0 errors
+- **UI Performance Benchmark:** 100 rapid keystrokes `<50ms` in RAM with $\le 1$ disk write (`tests/performance/uiPerformance.test.ts`)
+- **Version Parity Check:** `scripts/verify-version-sync.js` verified across `package.json`, `app.json`, `build.gradle`, and Git tag `v1.1.0`
+- **Standalone Build Status:** `gradlew assembleRelease` completed successfully in 3m 32s
+
+### 6.2 Signed Release APK Artifact Record
+- **Artifact File:** `evidence/release/CrunchBox-CB09-v1.1.0-release.apk`
+- **File Size:** `64,273,005 bytes` (`61.3 MB`)
+- **SHA-256 Checksum:** `26D89188CD728D973C707C62AF76456AA8AC66D60D1D80D9E4C1708614979CE7`
+- **Package ID:** `com.crunchbox.cb09`
+- **Version Code:** `2`
+- **Version Name:** `1.1.0`
+- **Target SDK:** `34` (Android 14)
+- **Min SDK:** `24` (Android 7.0)
+- **Certificate DN:** `CN=CrunchBox Engineering, OU=CB09 Hardware Labs, O=CrunchBox, L=Dhaka, ST=Dhaka, C=BD`
+- **Certificate SHA-256 Digest:** `55:58:3F:2D:13:67:60:FF:15:1B:89:C6:0F:8E:98:22:06:2D:67:37:77:BD:6B:87:49:B0:07:29:94:3F:55:0C`
+

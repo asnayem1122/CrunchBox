@@ -4,53 +4,54 @@
 
 ![CrunchBox CB-09 Feature Graphic](assets/store/feature-graphic.png)
 
+[![Download Latest Android APK](https://img.shields.io/badge/📲%20Download%20Latest%20Android%20APK-v1.1.0%20(61.3%20MB)-22C55E?style=for-the-badge&logo=android)](https://github.com/asnayem1122/CrunchBox/releases/latest)
+[![Tests - 182 Passed](https://img.shields.io/badge/Tests-182%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
 [![Platform - Android](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-2E3B33?style=for-the-badge&logo=android)](https://github.com/asnayem1122/CrunchBox)
 [![Expo - SDK 52](https://img.shields.io/badge/Expo-SDK%2052-1B241E?style=for-the-badge&logo=expo)](https://expo.dev/)
 [![React Native - 0.76](https://img.shields.io/badge/React%20Native-0.76.6-61DAFB?style=for-the-badge&logo=react)](https://reactnative.dev/)
 [![TypeScript - 5.3](https://img.shields.io/badge/TypeScript-5.3%20Strict-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tests - 154 Passed](https://img.shields.io/badge/Tests-154%20Passed%20(100%25)-22C55E?style=for-the-badge&logo=jest)](https://jestjs.io/)
-[![Latest APK Release](https://img.shields.io/github/v/release/asnayem1122/CrunchBox?label=Download%20Latest%20APK&style=for-the-badge&logo=android&color=22C55E)](https://github.com/asnayem1122/CrunchBox/releases/latest)
 [![License - MIT](https://img.shields.io/badge/License-MIT-D99E32?style=for-the-badge)](LICENSE)
 
 ---
 
-## 📦 Download Latest Release (Standalone Android APK)
+## 📲 Download Latest Release (Standalone Android APK)
 
-Get the official standalone build of **CrunchBox (`CB-09 FIELD UNIT`)** directly from GitHub Releases:
+Get the official signed standalone production build of **CrunchBox (`CB-09 FIELD UNIT`)** directly from GitHub Releases:
 
-[![Direct Download v1.1.0 APK](https://img.shields.io/badge/Download-CrunchBox%20v1.1.0%20APK%20(64%20MB)-22C55E?style=for-the-badge&logo=android)](https://github.com/asnayem1122/CrunchBox/releases/latest)
+### 🔗 **[Download CrunchBox-CB09-v1.1.0-release.apk (61.3 MB)](https://github.com/asnayem1122/CrunchBox/releases/latest)**
 
-> **Current Stable Release:** **`v1.1.0`** (`versionCode: 2`, 64.2 MB)  
-> **Direct Release Page:** [https://github.com/asnayem1122/CrunchBox/releases/latest](https://github.com/asnayem1122/CrunchBox/releases/latest)
+> **Current Stable Release:** **`v1.1.0`** (`versionCode: 2`, 61.3 MB / 64,273,005 bytes)  
+> **Direct Release Page:** [https://github.com/asnayem1122/CrunchBox/releases/latest](https://github.com/asnayem1122/CrunchBox/releases/latest)  
+> **Release Notes:** [evidence/release/RELEASE_NOTES_v1.1.0.md](evidence/release/RELEASE_NOTES_v1.1.0.md)
 
-### 📲 Non-Technical Installation & Upgrade Guide
-
-1. **Download:** Tap the button above or download `CrunchBox-CB09-v1.1.0.apk` to your Android phone.
-2. **Install:** Tap the downloaded `.apk` in your notifications or File Manager.
-   - *First-time install?* If Android displays a prompt saying *"For your security, your phone is not allowed to install unknown apps from this source"*, tap **Settings** and toggle **Allow from this source**, then tap **Install**.
-   - *Google Play Protect alert?* Since CrunchBox is open-source hardware software distributed directly via GitHub rather than the Play Store, tap **More details** followed by **Install anyway**.
-3. **In-Place Upgrades:** When updating from `v1.0.0` to `v1.1.0+`, the update installs directly over the existing app. All paper tape receipts, stored memory values, and customized backlight settings are preserved!
+### 📥 3-Step Phone Installation Guide
+1. **Download:** Tap the download link above directly on your Android phone.
+2. **Open APK:** Tap the downloaded `.apk` file in your Notification Bar or Downloads folder.
+   - *First-time APK install?* If Android asks for permission, tap **Settings** and toggle **Allow from this source**, then tap **Install**.
+   - *Google Play Protect alert?* Since CrunchBox is open-source hardware-grade software distributed directly on GitHub, tap **More details** $\rightarrow$ **Install anyway**.
+3. **In-Place Upgrades:** Installing over `v1.0.0` or older builds preserves all paper tape receipts, stored memory values, and customized backlight settings.
 
 ### 🔒 Cryptographic Authenticity & Integrity Verification
-
-Every official CrunchBox APK is signed with the official CB-09 Hardware Labs release key. Verify your download:
+Every official CrunchBox APK is cryptographically signed with the official CB-09 Hardware Labs release key. You can independently verify your download:
 
 | Attribute | Official Production Value |
 | :--- | :--- |
 | **Package ID** | `com.crunchbox.cb09` |
+| **Version Code / Name** | `2` / `1.1.0` |
+| **Target SDK / Min SDK**| `34` (Android 14) / `24` (Android 7.0) |
+| **Release Artifact** | `CrunchBox-CB09-v1.1.0-release.apk` (`64,273,005 bytes`) |
+| **APK SHA-256 Checksum** | `26D89188CD728D973C707C62AF76456AA8AC66D60D1D80D9E4C1708614979CE7` |
 | **Certificate DN** | `CN=CrunchBox Engineering, OU=CB09 Hardware Labs, O=CrunchBox, L=Dhaka, ST=Dhaka, C=BD` |
-| **Certificate SHA-256** | `55:58:3F:2D:13:67:60:FF:15:1B:89:C6:0F:8E:98:22:06:2D:67:37:77:BD:6B:87:49:B0:07:29:94:3F:55:0C` |
+| **Signing SHA-256 Digest** | `55:58:3F:2D:13:67:60:FF:15:1B:89:C6:0F:8E:98:22:06:2D:67:37:77:BD:6B:87:49:B0:07:29:94:3F:55:0C` |
 
-Verify the SHA-256 file checksum against `SHA256SUMS.txt`:
-```bash
+Verify checksum on your PC or terminal:
+```powershell
 # Windows PowerShell
-certutil -hashfile CrunchBox-CB09-v1.1.0.apk SHA256
+Get-FileHash -Algorithm SHA256 CrunchBox-CB09-v1.1.0-release.apk
 
 # Linux / macOS / Android Termux
-sha256sum CrunchBox-CB09-v1.1.0.apk
+sha256sum CrunchBox-CB09-v1.1.0-release.apk
 ```
-
-> For automated CI/CD release mechanics and maintainer instructions, see [**`docs/RELEASING.md`**](docs/RELEASING.md).
 
 ---
 
@@ -58,15 +59,16 @@ sha256sum CrunchBox-CB09-v1.1.0.apk
 
 **CrunchBox (Chassis Model: `CB-09 FIELD UNIT`)** is an industrial-tactile, cartoon-rugged, offline-first calculator, scientific workstation, 165+ currency converter, regional land unit engine, and Computer Science & Engineering (CSE) systems workbench built with **React Native, Expo Router, and TypeScript**.
 
-Inspired by vintage military telemetry equipment and neo-brutalist hardware aesthetics, CrunchBox replaces flimsy modern glass sliders with:
-- **3D tactile push-buttons** with springy travel and zero grid jitter.
-- **Synthesized 12ms mechanical switch clicks** using pure Web Audio (0ms latency, zero external MP3/WAV assets).
+Inspired by vintage military telemetry equipment and neo-brutalist hardware ergonomics, CrunchBox replaces flimsy glass sliders with:
+- **3D tactile push-buttons** with physical press depth and zero layout reflow.
+- **Synthesized 12ms mechanical switch clicks** using pure Web Audio (0ms latency, zero external sound assets).
 - **Recessed LCD annunciator screen** with 3 tactical backlight modes (*Sage Daylight*, *Amber Field Glow*, *Night-Ops Stealth*).
-- **64-bit CSE Systems Workbench** for multi-base radix conversion, hardware ALU flags, IEEE-754 floating point inspection, interactive bit grids, and pure-TS UTF-8 encoding.
+- **64-bit CSE Systems Workbench & Direct Binary Calculator (`BIN CALC`)** for multi-base radix conversion, hardware ALU flags, column-aligned bit truth tables, IEEE-754 floating point inspection, interactive bit grids, and pure-TS UTF-8 encoding.
 - **Regional Bangladeshi Land Math** alongside international SI and Imperial standards.
 - **Casio fx-991EX ClassWiz Suite:** Instant $S \Leftrightarrow D$ decimal-to-fraction conversions, `FACT` prime power factorization ($60 = 2^2 \times 3 \times 5$), multiplicative combinatorics ($n\text{C}r$, $n\text{P}r$), and universal physical constants ($c, g, h, N_A, \pi, e$).
 - **0ms Speculative Live Auto-Compute:** Displays real-time `ans ≈ ...` previews before pressing equals.
 - **Fast History Paper Tape Manager:** Search query filtering, mode tabs (`ALL`, `CALC`, `SCI`, `DEV`, `CURR`, `UNIT`, `TOOLS`), and 4 quick actions (`+ Use Ans`, `✏ Edit Expr`, `📋 Copy`, `★ Pin`).
+- **Interactive Bilingual Field Manual (`EN` / `বাংলা`):** Complete user guidebook with executable `"▶ Try It Now"` buttons.
 - **In-App QA Diagnostics & Telemetry:** Built-in hardware telemetry panel and 15-point automated self-test runner.
 
 ---
@@ -87,24 +89,34 @@ Inspired by vintage military telemetry equipment and neo-brutalist hardware aest
 ### 1. `CALC` — Standard Field Calculator
 - Robust Shunting-Yard expression tokenizer supporting unary negation (`-5 + 3`), implicit multiplication (`2π`, `5(2+3)`), postfix percentage (`50 + 10% = 55`), and factorial edge cases (`0! = 1`).
 - Stack memory operations: `MC`, `MR`, `M+`, `M-`, and `ANS`.
-- Inter-mode bridges: Tap **`SEND TO CURR`** to instantly transfer the evaluated total to the currency converter.
+- Inter-mode bridges: Tap **`➔ SEND TO CURR`** to instantly transfer the evaluated total to the currency converter.
 
-### 2. `SCI` — Scientific Bipolar Engine
-- Dual angular modes: **`DEG`** (degrees) and **`RAD`** (radians) reflected in real-time on the LCD annunciator.
+### 2. `SCI` — Scientific Bipolar Engine & fx-991EX ClassWiz
+- **Casio ClassWiz fx-991EX Precision Engine:**
+  - **$S \Leftrightarrow D$ Display Key:** Toggle evaluated results between decimal, exact simplified proper/improper fractions, and mixed numbers.
+  - **`FACT` Prime Factorization:** Decomposes any integer into its prime power factors (`24` $\rightarrow$ `2³ × 3`).
+  - **Permutations ($n\text{P}r$) & Combinations ($n\text{C}r$):** Multiplicative loop implementation supporting $n > 170$ without overflow.
+  - **Scientific Constants Rail:** 1-tap insertion of physical constants ($\pi$, $e$, $c$, $h$, $G$, $N_A$).
+- **Dual Angular Modes:** **`DEG`** (degrees) and **`RAD`** (radians) reflected in real-time on the LCD annunciator.
+- **Live Auto-Compute:** Instantaneous 0ms `ans ≈ ...` preview below the expression line before pressing equals.
 - Full trigonometric (`sin`, `cos`, `tan`), hyperbolic (`sinh`, `cosh`, `tanh`), inverse functions (`asin`, `acos`, `atan`), logarithms (`ln`, `log10`), and power operators ($x^y$, $\sqrt{x}$, $x!$).
 
 ### 3. `DEV` — CSE Systems & Architecture Workbench
 Designed specifically for Computer Science & Engineering students, systems programmers, and low-level engineers:
-- **Direct Binary Calculation Section (`BIN CALC`):** Dual universal operands with independent base selection (`BIN`, `DEC`, `HEX`, `OCT`, `ASCII`), column-aligned bit-level truth table, and direct arithmetic/logic evaluation (`+`, `-`, `*`, `/`, `%`, `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `XNOR`, `SHL`, `SHR`, `SAR`, `ROL`, `ROR`, `ENDIAN`).
-- **64-bit Multi-Base Radix Engine:** Seamless conversion across `HEX`, `DEC`, `OCT`, and `BIN` with nibble spacing (`1111 0000`) and strict keypad digit locking (invalid keys dimmed and disabled).
-- **ALU Logic & Hardware Flags:**
-  - Operations: `ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `XNOR`, `SHL`, `SHR`, `SAR`, `ROR`, `ROL`, and `ENDIAN_SWAP`.
-  - Flags: `ZF` (Zero Flag), `SF` (Sign Flag), `CF` (Carry Flag: `null`/`—` on logic ops, accurate borrow/carry on arithmetic), and `OF` (Signed Two's Complement Overflow).
-  - Explicit divide-by-zero fault detection (`DIV_BY_ZERO`).
-- **IEEE-754 Single-Precision Float Inspector:** Hardware-accurate 32-bit floating point decomposition showing Sign (1b), Exponent (8b), Mantissa (23b), and 32-bit Hex (`-12.375` $\rightarrow$ `0xC1460000`).
-- **Interactive 64-bit Bit Grid & Truth Table:** Visual bit manipulation with tappable bit flips and bit position labels (`63..0`).
-- **Pure-TS Multi-Byte UTF-8 Codec:** Zero-dependency encoder and decoder converting strings to hex/binary byte arrays (supports Unicode and Bengali `'বাংলা'`).
-- **Discrete Math:** Modular arithmetic, GCD, LCM, Prime verification with smallest factor, and powers of two.
+- **Direct Binary Calculation Section (`BIN CALC` / `দ্বিমিক হিসাব`):**
+  - **Dual Universal Operands:** Independently switch and enter Operand A and Operand B in ANY radix (`BIN`, `DEC`, `HEX`, `OCT`, `ASCII`). Switching formats converts representations seamlessly without losing canonical values.
+  - **Dedicated ASCII Character Picker:** Direct 1-character input with keyboard support plus 19 one-tap presets (`'A'`, `'a'`, `'0'`, `'!'`, `'~'`, `'SPC'`, `'\n'`, `'\0'`).
+  - **Touch-Friendly Column-Aligned Bit Truth Table:** 32dp column-aligned inspection grid with 4-bit nibble separators. Tapping any bit in Operand A or B toggles `0 ⇄ 1` instantaneously. Smooth horizontal scroll for 8, 16, 32, and 64-bit words.
+  - **Extended ALU Operations:**
+    - `MUL` with full unsigned carry (`CF`) and signed two's-complement overflow (`OF`) detection.
+    - `DIV` and `MOD` with explicit divide-by-zero fault handling (`DIV_BY_ZERO`, `ZF = false`, LCD alert `"ERR: DIV BY 0"`).
+    - `SAR` (sign-preserving arithmetic shift right) alongside `SHL`, `SHR`, `ROL`, and `ROR`.
+  - **Multi-Format Result Panel:** Simultaneous live readouts across all bases (`BIN`, `DEC`, `HEX`, `OCT`, `ASCII`), ALU flags (`ZF`, `SF`, `CF`, `OF`), `ANS → A` chaining, one-tap copy, and Paper Tape logging.
+- **64-bit Multi-Base Radix Engine (`BASES`):** Seamless conversion across `HEX`, `DEC`, `OCT`, and `BIN` with nibble spacing (`1111 0000`) and strict keypad digit locking.
+- **IEEE-754 Single-Precision Float Inspector (`FLOAT`):** Hardware-accurate 32-bit floating point decomposition showing Sign (1b), Exponent (8b), Mantissa (23b), and 32-bit Hex (`-12.375` $\rightarrow$ `0xC1460000`).
+- **Interactive 64-bit Bit Grid (`ALU`):** Visual 8-bits-per-row grid with tappable bit flips and bit position labels (`63..0`).
+- **Pure-TS Multi-Byte UTF-8 Codec (`TEXT`):** Zero-dependency encoder and decoder converting strings to hex/binary byte arrays (supports Unicode and Bengali `'বাংলা'`).
+- **Discrete Math (`DISCRETE`):** Modular arithmetic, GCD, LCM, Prime verification with smallest factor, and powers of two.
 
 ### 4. `CURR` — 165+ Offline-First Currency Converter
 - Priority dual-source rate merging: **Fawaz Ahmed Currency API CDN** (165+ global currencies) overlaid with **Frankfurter ECB** (European Central Bank official rates).
@@ -127,7 +139,7 @@ Designed specifically for Computer Science & Engineering students, systems progr
 
 ---
 
-## 🎨 Industrial Tactile Hardware Design
+## 🎨 Industrial Tactile Hardware & 60fps Zero-Shake Architecture
 
 ```
 +-----------------------------------------------------------+
@@ -143,9 +155,12 @@ Designed specifically for Computer Science & Engineering students, systems progr
 +-----------------------------------------------------------+
 ```
 
-1. **Zero-Jitter Tactile Buttons:** Outer wrapper with fixed layout height and static 3D shadow layer; inner keycap face translates down by `3px` on press without causing adjacent keypad rows to jump.
-2. **Micro-Annunciator Strip:** LCD display header showing active trig mode (`DEG`/`RAD`), backlight mode (`SAGE`/`AMBR`/`NVG`), number grouping format (`BD`/`INTL`), and live ALU status flags.
-3. **Monospace Perforated Paper Tape:** Pull-down receipt drawer with row pinning, tap-to-load memory recall, and ASCII export for receipts:
+1. **Zero-Jitter Tactile Buttons:** Outer wrapper with strict fixed layout height and static 3D shadow layer; inner keycap face translates down by `2.5px` on press without causing adjacent keypad rows to jump or shake.
+2. **Fixed-Height LCD Display:** Locked to constant `118px` (standard) or `142px` (with annunciator bar), and permanent `18px` live answer slot preventing vertical keypad jumping during auto-compute.
+3. **Atomic Zustand Subscriptions:** Fine-grained selectors (`useAppStore(s => s.prop)`) decouple keypad buttons from global expression changes, resulting in **0 button re-renders during active typing**.
+4. **RAM-Speed Persistence:** Zustand `AsyncStorage` writes are debounced with a 250ms trailing timer. Rapid typing runs 100% in RAM with zero JS thread stalling.
+5. **Micro-Annunciator Strip:** LCD display header showing active trig mode (`DEG`/`RAD`), backlight mode (`SAGE`/`AMBR`/`NVG`), number grouping format (`BD`/`INTL`), and live ALU status flags.
+6. **Monospace Perforated Paper Tape:** Pull-down receipt drawer with search filter, mode tabs, tap-to-load memory recall, and ASCII export for receipts:
    ```
    +==================================+
    | CRUNCHBOX // CB-09 FIELD RECEIPT |
@@ -157,7 +172,7 @@ Designed specifically for Computer Science & Engineering students, systems progr
    |    = 0x80 (ALU: OF=1)            |
    +==================================+
    ```
-4. **Bilingual Typography (EN + বাংলা):** Complete synchronous translation with `includeFontPadding: false` and calculated line heights so Bengali vowel markers (ই-কার, ঈ-কার, রেফ) never clip.
+7. **Bilingual Typography (EN + বাংলা):** Complete synchronous translation with `includeFontPadding: false` and calculated line heights so Bengali vowel markers (ই-কার, ঈ-কার, রেফ) never clip.
 
 ---
 
@@ -167,7 +182,7 @@ Designed specifically for Computer Science & Engineering students, systems progr
 CrunchBox/
 ├── android/                         # Native Android Gradle project (Prebuild)
 │   ├── app/
-│   │   ├── build.gradle             # Configured with release signingConfigs
+│   │   ├── build.gradle             # Configured with fail-closed release signing
 │   │   └── src/main/AndroidManifest.xml
 │   └── gradle.properties            # Kotlin 1.9.25, Hermes enabled
 ├── assets/
@@ -179,13 +194,18 @@ CrunchBox/
 │   │   └── feature-graphic.svg      # 1024x500 Play Store banner
 │   ├── images/                      # Generated PNGs (icon, splash, adaptive)
 │   └── store/                       # Play Store launcher and banner PNGs
-├── evidence/                        # Verification ledgers & device screenshots
+├── docs/
+│   └── RELEASING.md                 # Deterministic APK distribution guide
+├── evidence/                        # Verification ledgers & release artifacts
 │   ├── QA_LEDGER.md                 # Complete verification matrix & signing info
+│   ├── release/                     # Standalone signed release APK & notes
+│   │   ├── CrunchBox-CB09-v1.1.0-release.apk
+│   │   └── RELEASE_NOTES_v1.1.0.md
 │   ├── before/                      # Pre-upgrade baseline screenshots
-│   ├── after/                       # Device condition matrix screenshots
-│   └── release/                     # Standalone release APK & live captures
+│   └── v1.1.0/                      # v1.1.0 verification screenshots
 ├── scripts/
-│   └── generate-brand-assets.mjs    # Automated @resvg/resvg-js rasterizer
+│   ├── verify-version-sync.js       # CI version parity validation gate
+│   └── generate-brand-assets.mjs    # Automated rasterizer
 ├── src/
 │   ├── app/                         # Expo Router screens
 │   │   ├── _layout.tsx              # Root layout wrapped in HardwareErrorBoundary
@@ -203,8 +223,12 @@ CrunchBox/
 │   │   └── TactileButton.tsx        # 3D depressible button component
 │   ├── features/                    # Domain math and business logic
 │   │   ├── calc/calcEngine.ts       # Shunting-yard expression evaluator
+│   │   ├── class-wiz/classWizEngine.ts # fx-991EX S<=>D, FACT, nCr, nPr
 │   │   ├── dev/devEngine.ts         # 64-bit BigInt, ALU flags, IEEE-754, bit grid
 │   │   ├── dev/DevView.tsx          # CSE Workbench sub-decks
+│   │   ├── dev/DirectBinaryCalcView.tsx # Direct Binary Calculator (BIN CALC)
+│   │   ├── diagnostics/HardwareDiagnosticsModal.tsx # In-App QA Analyzer
+│   │   ├── guidebook/GuidebookModal.tsx # Interactive Bilingual Manual
 │   │   ├── exchange-rate/api.ts     # Fawaz + Frankfurter multi-API fetcher
 │   │   ├── exchange-rate/rateService.ts # Offline-first rate caching & fallback
 │   │   ├── financial/financialFormulas.ts # Tip, tax, fuel, compound formulas
@@ -218,10 +242,19 @@ CrunchBox/
 │       ├── soundEffects.ts          # Pure Web Audio switch click & haptics
 │       ├── themeTokens.ts           # Neo-brutalist palettes & backlight modes
 │       └── useHardwareLayout.ts     # Responsive viewport and inset metrics
-├── tests/                           # Complete Jest test suite (132 tests)
+├── tests/                           # Complete Jest test suite (182 tests across 15 suites)
+│   ├── features/
+│   │   ├── binaryCalculation.test.ts# BIN CALC unit tests
+│   │   ├── classWizEngine.test.ts   # fx-991EX test suite
+│   │   ├── devEngine.test.ts        # 64-bit ALU & IEEE-754 test suite
+│   │   └── calcEngine.test.ts       # Shunting-yard test suite
+│   ├── performance/
+│   │   └── uiPerformance.test.ts    # 60fps zero-shake & debounce benchmarks
+│   └── scripts/
+│       └── verifyVersionSync.test.ts# Version sync unit tests
 ├── app.json                         # Expo configuration (Package: com.crunchbox.cb09)
 ├── BRAIN.md                         # Project memory, ADRs & upgrade roadmap
-├── CHANGELOG.md                     # Release history (v1.0.0)
+├── CHANGELOG.md                     # Release history (v1.0.0, v1.1.0)
 ├── CONTRIBUTING.md                  # Development guidelines & PR workflow
 └── package.json
 ```
@@ -234,7 +267,6 @@ CrunchBox/
 - **Node.js:** v18+ (tested on Node v20/v24)
 - **Java JDK:** OpenJDK 17 (`JAVA_HOME`)
 - **Android SDK:** Platform-Tools & Build-Tools 35 (`ANDROID_HOME`)
-- **Physical Phone:** Android device with USB Debugging enabled
 
 ### 1. Installation
 ```powershell
@@ -248,23 +280,14 @@ npm install
 # Strict TypeScript validation
 npm run typecheck
 
-# Execute all 132 Jest unit tests across 10 suites
+# Execute all 182 Jest unit & performance tests across 15 suites
 npm test
+
+# Verify deterministic version synchronization
+npm run verify:version -- --tag v1.1.0
 ```
 
-### 3. Connect Physical Android Device over USB
-```powershell
-# Confirm device shows as "device"
-adb devices
-
-# Reverse Metro bundler port
-adb reverse tcp:8081 tcp:8081
-
-# Start Metro development server
-npm start
-```
-
-### 4. Build Standalone Signed Release APK
+### 3. Build Standalone Signed Release APK
 To compile the standalone APK that runs on Android hardware with zero Metro dependency:
 ```powershell
 cd android
@@ -276,14 +299,14 @@ cd android
 adb install -r app/build/outputs/apk/release/app-release.apk
 
 # Launch standalone app on device
-adb shell monkey -p com.crunchbox.cb09 -c android.intent.category.LAUNCHER 1
+adb shell am start -n com.crunchbox.cb09/.MainActivity
 ```
 
 ---
 
 ## 🔒 Security & Release Integrity
 - **Package ID:** `com.crunchbox.cb09`
-- **Signing Scheme:** Android APK Signature Scheme v2 (Signed with custom PKCS12 keystore)
+- **Signing Scheme:** Android APK Signature Scheme v2 (Signed with official CB-09 PKCS12 release keystore)
 - **Permissions:** Restricted strictly to `android.permission.INTERNET` (for exchange rate updates) and `android.permission.VIBRATE` (for tactile haptics).
 - **Offline Guarantee:** All calculation, scientific, discrete math, unit conversion, and currency operations run 100% offline.
 - **Zero Leaked Secrets:** All keystores (`*.jks`), `keystore.properties`, and `local.properties` are strictly excluded from version control via `.gitignore`.
