@@ -12,6 +12,7 @@ yarn-error.log*
 # Keystores & Signing Secrets
 *.jks
 *.keystore
+!android/app/debug.keystore
 keystore.properties
 local.properties
 
